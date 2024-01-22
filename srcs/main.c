@@ -11,38 +11,55 @@ int	get_argc_left(int argc, char *argv[])
 	return (ret);
 }
 
-int	f(char path[], int flags)
+void	*map_file(char path[], unsigned long *size_buf)
 {
-	(void) flags;
-	if (!path)
-		return (1);
-	int	fd = open(path, O_RDONLY);
-	if (fd == -1)
-		return (1);
-	
+	void		*addr;
 	struct stat	stat_buf;
+	int	fd;
+
+	*size_buf = 0;
+	if (!path)
+		return (NULL);
+	fd = open(path, O_RDONLY);
+	if (fd == -1)
+		return (NULL);
+	
 	if (fstat(fd, &stat_buf) == -1)
 	{
 		close(fd);
-		return (1);
+		return (NULL);
 	}
-	char	*addr = mmap(NULL, stat_buf.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+	addr = mmap(NULL, stat_buf.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
 	if (addr == MAP_FAILED)
+		addr = NULL;
+	close(fd);
+	*size_buf = stat_buf.st_size;
+	return (addr);
+}
+
+int	list_symbols(char path[], int flags)
+{
+	unsigned long	size;
+	void			*addr;
+	t_elf			elf;
+
+	(void) flags;
+
+	if (!path)
+		return (1);
+	addr = map_file(path, &size);
+	if (!addr)
+		return (1);
+
+	elf = init_elf(addr);
+	if (!ft_memcmp(&elf, &DEF_ELF, sizeof(t_elf)))
 	{
-		perror("mmap");
-		ft_printf("size: %d\nfd: %d\n", stat_buf.st_size, fd);
-		close(fd);
+		munmap(addr, size);
 		return (1);
 	}
-	if (close(fd) == -1)
-		return (1);
 
-
-	write(1, addr, stat_buf.st_size);
-
-	
-
-	if (munmap(addr, stat_buf.st_size) == -1)
+	print_elf(elf);
+	if (munmap(addr, size) == -1)
 		return (1);
 	return (0);
 }
@@ -53,11 +70,11 @@ int	main(int argc, char *argv[])
 	if (flags == -1)
 		return (1);
 	if (!get_argc_left(argc - 1, argv + 1))
-		return (f("a.out", flags));
+		return (list_symbols("a.out", flags));
 	int	ret = 0;
 	for (int i = 1; i < argc; i++)
 		if (argv[i])
-			if (f(argv[i], flags))
+			if (list_symbols(argv[i], flags))
 				ret = 1;
 	return (ret);
 }

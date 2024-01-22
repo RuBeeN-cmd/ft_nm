@@ -7,12 +7,18 @@ _CYAN="\033[0;36m"
 NAME = ft_nm
 
 SRC = main.c \
-		flags.c
+		flags.c \
+		elf.c \
+		elf_header.c \
+		program_header.c \
+		section_header.c \
+		symbol.c \
+		print_utils.c
 
 OBJ = $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))
 
 CC = gcc
-CFLAGS = -Wall -Werror -Wextra
+CFLAGS = -Wall -Werror -Wextra -g3
 INC = -Iincludes -I$(dir $(LIB))/includes
 
 LIB = libft/libft.a
