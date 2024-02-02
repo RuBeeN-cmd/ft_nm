@@ -54,6 +54,16 @@ typedef struct	s_elf
 	char		*dynstr;
 }				t_elf;
 
+typedef struct	s_symlist
+{
+	char				*name;
+	struct	s_symlist	*next;
+	union {
+		Elf32_Sym	*sym32;
+		Elf64_Sym	*sym64;
+	};
+}				t_symlist;
+
 // flags.c
 int	parse_flags(int argc, char *argv[]);
 
@@ -76,8 +86,6 @@ void	print_64section_header(Elf64_Shdr *hdr, int hdr_number, char *str_table);
 // symbol.c
 void	print_32symbol_table(Elf32_Sym *sym, uint64_t sym_len, char *str_table);
 void	print_64symbol_table(Elf64_Sym *sym, uint64_t sym_len, char *str_table);
-void	print_64dynsymbol_table(Elf64_Sym *sym, uint64_t sym_len, char *str_table);
-void	print_32dynsymbol_table(Elf32_Sym *sym, uint32_t sym_len, char *str_table);
 
 // print_utils.c
 void	print_column(char *str, char c, unsigned int s);

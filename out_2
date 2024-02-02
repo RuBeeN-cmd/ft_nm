@@ -1,0 +1,101 @@
+000000000000038cu  1  0  4  __abi_tag
+0000000000001190u  2  0  16  deregister_tm_clones
+00000000000011c0u  2  0  16  register_tm_clones
+0000000000001200u  2  0  16  __do_global_dtors_aux
+0000000000008010u  1  0  26  completed.0
+0000000000007d80u  1  0  22  __do_global_dtors_aux_fini_array_entry
+0000000000001240u  2  0  16  frame_dummy
+0000000000007d78u  1  0  21  __frame_dummy_init_array_entry
+0000000000006110u  1  0  20  __FRAME_END__
+0000000000007d88u  1  0  23  _DYNAMIC
+0000000000005868u  0  0  19  __GNU_EH_FRAME_HDR
+0000000000007f78u  1  0  24  _GLOBAL_OFFSET_TABLE_
+                u  18  0  0  free@GLIBC_2.2.5
+                u  18  0  0  __libc_start_main@GLIBC_2.34
+                u  32  0  0  _ITM_deregisterTMCloneTable
+0000000000008000u  32  0  25  data_start
+0000000000004e31u  18  0  16  print_addr_fd
+00000000000043a5u  18  0  16  print_number_column
+0000000000004d6du  18  0  16  print_nbrbase_fd
+00000000000028c6u  18  0  16  print_32elf_header
+                u  18  0  0  write@GLIBC_2.2.5
+0000000000001d7eu  18  0  16  fill_elf64_tables
+000000000000457fu  18  0  16  ft_strlen
+0000000000008010u  16  0  25  _edata
+0000000000002179u  18  0  16  print_label
+00000000000023a8u  18  0  16  print_version
+000000000000362au  18  0  16  print_32dynsymbol_table
+0000000000004f18u  18  2  17  _fini
+00000000000030c2u  18  0  16  print_64program_header
+                u  18  0  0  __stack_chk_fail@GLIBC_2.4
+00000000000012adu  18  0  16  map_file
+                u  18  0  0  mmap@GLIBC_2.2.5
+00000000000025e8u  18  0  16  print_type
+000000000000230du  18  0  16  print_data
+                u  18  0  0  close@GLIBC_2.2.5
+000000000000425du  18  0  16  ft_itoa_base
+00000000000018aau  18  0  16  parse_flags
+0000000000003be4u  18  0  16  print_64dynsymbol_table
+0000000000008000u  16  0  25  __data_start
+0000000000001a98u  18  0  16  fill_elf32_tables
+0000000000002c08u  18  0  16  print_64elf_header
+                u  32  0  0  __gmon_start__
+0000000000008008u  17  2  25  __dso_handle
+0000000000004c3eu  18  0  16  ft_nbrlen_base
+0000000000005000u  17  0  18  _IO_stdin_used
+0000000000002272u  18  0  16  print_class
+00000000000021deu  18  0  16  print_ident
+0000000000004331u  18  0  16  print_column
+0000000000004af8u  18  0  16  print_str_fd
+00000000000041feu  18  0  16  get_nb_len_base
+                u  18  0  0  malloc@GLIBC_2.2.5
+0000000000002f4du  18  0  16  print_32program_header
+000000000000323du  18  0  16  print_32section_header
+000000000000240cu  18  0  16  print_osabi
+00000000000044f6u  18  0  16  ft_strchr
+0000000000008018u  16  0  26  _end
+0000000000001160u  18  0  16  _start
+0000000000008010u  16  0  26  __bss_start
+                u  18  0  0  munmap@GLIBC_2.2.5
+00000000000015d4u  18  0  16  main
+0000000000004c96u  18  0  16  ft_is_base_wrong
+0000000000003432u  18  0  16  print_64section_header
+0000000000003ef1u  18  0  16  print_64symbol_table
+                u  18  0  0  open@GLIBC_2.2.5
+0000000000004966u  18  0  16  ft_treat_char
+0000000000004671u  18  0  16  ft_treat_type
+0000000000001249u  18  0  16  get_argc_left
+0000000000004e92u  18  0  16  print_unbr_fd
+0000000000001ffcu  18  0  16  init_elf
+0000000000004a0du  18  0  16  ft_printf
+00000000000013deu  18  0  16  list_symbols
+0000000000004498u  18  0  16  ft_putstr_fd
+0000000000001a0bu  18  0  16  print_elf
+00000000000043fcu  18  0  16  ft_memcmp
+00000000000045b3u  18  0  16  ft_strncmp
+0000000000003902u  18  0  16  print_32symbol_table
+000000000000446bu  18  0  16  ft_putchar_fd
+0000000000004b63u  18  0  16  print_nbr_fd
+0000000000008010u  17  2  25  __TMC_END__
+00000000000017b2u  18  0  16  get_short_flag
+                u  32  0  0  _ITM_registerTMCloneTable
+000000000000182fu  18  0  16  get_short_flags
+                u  18  0  0  fstat@GLIBC_2.33
+                u  34  0  0  __cxa_finalize@GLIBC_2.2.5
+0000000000001000u  18  2  12  _init
+00000000000016b0u  18  0  16  get_long_flag
+00000000000027a3u  18  0  16  print_machine
+                u  18  0  0  free
+                u  18  0  0  __libc_start_main
+                u  32  0  0  _ITM_deregisterTMCloneTable
+                u  18  0  0  write
+                u  18  0  0  __stack_chk_fail
+                u  18  0  0  mmap
+                u  18  0  0  close
+                u  32  0  0  __gmon_start__
+                u  18  0  0  malloc
+                u  18  0  0  munmap
+                u  18  0  0  open
+                u  32  0  0  _ITM_registerTMCloneTable
+                u  18  0  0  fstat
+                u  34  0  0  __cxa_finalize

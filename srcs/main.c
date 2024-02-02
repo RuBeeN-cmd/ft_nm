@@ -23,7 +23,6 @@ void	*map_file(char path[], unsigned long *size_buf)
 	fd = open(path, O_RDONLY);
 	if (fd == -1)
 		return (NULL);
-	
 	if (fstat(fd, &stat_buf) == -1)
 	{
 		close(fd);
@@ -36,6 +35,8 @@ void	*map_file(char path[], unsigned long *size_buf)
 	*size_buf = stat_buf.st_size;
 	return (addr);
 }
+
+int a = 2;
 
 int	list_symbols(char path[], int flags)
 {
