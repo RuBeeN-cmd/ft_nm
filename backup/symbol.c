@@ -36,13 +36,13 @@ void print_64symbol_table(Elf64_Sym *sym, uint64_t sym_len, char *str_table)
 		return;
 	for (uint64_t i = 0; i < sym_len; i++)
 	{
-		if (!*(str_table + sym[i].st_name))
-			continue;
-		if (!ft_strncmp(str_table + sym[i].st_name + ft_strlen(str_table + sym[i].st_name) - 2,
-						".c", 2) ||
-			!ft_strncmp(str_table + sym[i].st_name + ft_strlen(str_table + sym[i].st_name) - 2,
-						".o", 2))
-			continue;
+		// if (!*(str_table + sym[i].st_name))
+		// 	continue;
+		// if (!ft_strncmp(str_table + sym[i].st_name + ft_strlen(str_table + sym[i].st_name) - 2,
+		// 				".c", 2) ||
+		// 	!ft_strncmp(str_table + sym[i].st_name + ft_strlen(str_table + sym[i].st_name) - 2,
+		// 				".o", 2))
+		// 	continue;
 		ft_printf("%d  ", sym[i].st_other);
 		ft_printf("%d  ", sym[i].st_shndx);
 		ft_printf("%s\n", str_table + sym[i].st_name);

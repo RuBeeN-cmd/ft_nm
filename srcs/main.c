@@ -36,14 +36,11 @@ void	*map_file(char path[], unsigned long *size_buf)
 	return (addr);
 }
 
-int a = 2;
-
 int	list_symbols(char path[], int flags)
 {
 	unsigned long	size;
 	void			*addr;
 	t_elf			elf;
-
 	(void) flags;
 
 	if (!path)
@@ -51,14 +48,12 @@ int	list_symbols(char path[], int flags)
 	addr = map_file(path, &size);
 	if (!addr)
 		return (1);
-
 	elf = init_elf(addr);
 	if (!ft_memcmp(&elf, &DEF_ELF, sizeof(t_elf)))
 	{
 		munmap(addr, size);
 		return (1);
 	}
-
 	print_elf(elf);
 	if (munmap(addr, size) == -1)
 		return (1);
