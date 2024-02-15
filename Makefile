@@ -9,7 +9,10 @@ NAME = ft_nm
 SRC = main.c \
 		flags.c \
 		elf.c \
-		sym_list.c 
+		sym_list.c \
+		error.c \
+		read.c \
+		print.c
 OBJ = $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))
 
 CC = gcc

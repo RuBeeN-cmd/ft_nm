@@ -41,14 +41,18 @@ void	define_symtab(uint8_t *addr, t_elf *elf)
 			if (!ft_strncmp(strtab + SH_NAME(SH_INDEX(header, i, elf->class), elf->class), ".strtab", 8))
 				elf->symtab.strtab = (char *) addr + SH_OFFSET(SH_INDEX(header, i, elf->class), elf->class);
 	}
+	return ;
 }
 
-t_elf	init_elf(uint8_t *addr)
+t_elf	init_elf(uint8_t *addr, char *file_path)
 {
 	t_elf	elf;
 
 	if (check_elf_header(addr))
+	{
+		print_error("file format not recognized", file_path, 0);
 		return (DEF_ELF);
+	}
 	ft_bzero(&elf, sizeof(t_elf));
 	set_elf_header_values(addr, &elf);
 	elf.shdr = addr + EH_SHOFF(addr, elf.class);
@@ -84,12 +88,16 @@ void	sort_symtab(t_sym_section symtab, int class)
 	}
 }
 
-void	print_elf(t_elf elf)
+void	print_elf(t_elf elf, char *file_path)
 {
 	if (!elf.symtab.symtab || !elf.symtab.strtab)
+	{
+		print_error("no symbols", file_path, 0);
 		return ;
+	}
 	t_sym_list	*all_sym = init_sym_list(elf.symtab, elf.class);
 	sort_sym_list(all_sym, elf.class);
 	print_sym_list(all_sym, elf.shdr, elf.shnum, elf.class);
 	free_sym_list(all_sym);
+	return ;
 }
