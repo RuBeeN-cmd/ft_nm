@@ -70,12 +70,13 @@ int	main(int argc, char *argv[])
 	int	flags = parse_flags(argc - 1, argv + 1);
 	if (flags == -1)
 		return (1);
-	if (!get_argc_left(argc - 1, argv + 1))
+	int argc_left = get_argc_left(argc - 1, argv + 1);
+	if (!argc_left)
 		return (list_symbols("a.out", flags, 0));
 	int	ret = 0;
 	for (int i = 1; i < argc; i++)
 		if (argv[i])
-			if (list_symbols(argv[i], flags, argc - 1 > 0))
+			if (list_symbols(argv[i], flags, argc_left > 1))
 				ret = 1;
 	return (ret);
 }
