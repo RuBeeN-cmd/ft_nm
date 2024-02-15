@@ -28,18 +28,18 @@ void	define_symtab(uint8_t *addr, t_elf *elf)
 
 	if (!addr || !elf)
 		return ;
-	header = addr + EH_SHOFF(addr, elf->class);
-	strtab = (char *) (addr + SH_OFFSET(SH_INDEX(header, EH_SHSTRNDX(addr, elf->class), elf->class), elf->class));
-	for (uint16_t i = 0; i < EH_SHNUM(addr, elf->class); i++)
+	header = addr + EH_SHOFF(addr, elf->class, elf->endian);
+	strtab = (char *) (addr + SH_OFFSET(SH_INDEX(header, EH_SHSTRNDX(addr, elf->class, elf->endian), elf->class), elf->class, elf->endian));
+	for (uint16_t i = 0; i < EH_SHNUM(addr, elf->class, elf->endian); i++)
 	{
-		if (SH_TYPE(SH_INDEX(header, i, elf->class), elf->class) == SHT_SYMTAB)
+		if (SH_TYPE(SH_INDEX(header, i, elf->class), elf->class, elf->endian) == SHT_SYMTAB)
 		{
-			elf->symtab.symtab = addr + SH_OFFSET(SH_INDEX(header, i, elf->class), elf->class);
-			elf->symtab.len = SH_SIZE(SH_INDEX(header, i, elf->class), elf->class) / SYM_SIZE(elf->class);
+			elf->symtab.symtab = addr + SH_OFFSET(SH_INDEX(header, i, elf->class), elf->class, elf->endian);
+			elf->symtab.len = SH_SIZE(SH_INDEX(header, i, elf->class), elf->class, elf->endian) / SYM_SIZE(elf->class);
 		}
-		else if (SH_TYPE(SH_INDEX(header, i, elf->class), elf->class) == SHT_STRTAB)
-			if (!ft_strncmp(strtab + SH_NAME(SH_INDEX(header, i, elf->class), elf->class), ".strtab", 8))
-				elf->symtab.strtab = (char *) addr + SH_OFFSET(SH_INDEX(header, i, elf->class), elf->class);
+		else if (SH_TYPE(SH_INDEX(header, i, elf->class), elf->class, elf->endian) == SHT_STRTAB)
+			if (!ft_strncmp(strtab + SH_NAME(SH_INDEX(header, i, elf->class), elf->class, elf->endian), ".strtab", 8))
+				elf->symtab.strtab = (char *) addr + SH_OFFSET(SH_INDEX(header, i, elf->class), elf->class, elf->endian);
 	}
 	return ;
 }
@@ -55,8 +55,8 @@ t_elf	init_elf(uint8_t *addr, char *file_path)
 	}
 	ft_bzero(&elf, sizeof(t_elf));
 	set_elf_header_values(addr, &elf);
-	elf.shdr = addr + EH_SHOFF(addr, elf.class);
-	elf.shnum = EH_SHNUM(addr, elf.class);
+	elf.shdr = addr + EH_SHOFF(addr, elf.class, elf.endian);
+	elf.shnum = EH_SHNUM(addr, elf.class, elf.endian);
 	define_symtab(addr, &elf);
 	return (elf);
 }
@@ -70,7 +70,7 @@ void	swap_sym(Elf64_Sym *s1, Elf64_Sym *s2)
 	*s2 = tmp;
 }
 
-void	sort_symtab(t_sym_section symtab, int class)
+void	sort_symtab(t_sym_section symtab, int class, int endian)
 {
 	Elf64_Sym	*tmp;
 	Elf64_Sym	*sym = symtab.symtab;
@@ -82,7 +82,7 @@ void	sort_symtab(t_sym_section symtab, int class)
 		tmp = sym + i;
 		for (uint64_t j = i + 1; j < symtab.len; j++)
 		{
-			if (ft_strcmp_escape(symtab.strtab + SYM_NAME(tmp, class), symtab.strtab + SYM_NAME(sym + j, class), "_", 1) > 0)
+			if (ft_strcmp_escape(symtab.strtab + SYM_NAME(tmp, class, endian), symtab.strtab + SYM_NAME(sym + j, class, endian), "_", 1) > 0)
 				swap_sym(tmp, sym + j);
 		}
 	}
@@ -95,9 +95,9 @@ void	print_elf(t_elf elf, char *file_path)
 		print_error("no symbols", file_path, 0);
 		return ;
 	}
-	t_sym_list	*all_sym = init_sym_list(elf.symtab, elf.class);
-	sort_sym_list(all_sym, elf.class);
-	print_sym_list(all_sym, elf.shdr, elf.shnum, elf.class);
+	t_sym_list	*all_sym = init_sym_list(elf.symtab, elf.class, elf.endian);
+	sort_sym_list(all_sym, elf.class, elf.endian);
+	print_sym_list(all_sym, elf.shdr, elf.shnum, elf.class, elf.endian);
 	free_sym_list(all_sym);
 	return ;
 }

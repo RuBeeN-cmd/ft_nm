@@ -41,7 +41,7 @@ int     ft_strcmp_escape(char *n1, char *n2, char *set, int lower)
 }
 
 
-void	sort_sym_list(t_sym_list *sym, int class)
+void	sort_sym_list(t_sym_list *sym, int class, int endian)
 {
 	t_sym_list	*tmp;
 	int			ret = 0;
@@ -54,7 +54,7 @@ void	sort_sym_list(t_sym_list *sym, int class)
 			ret = ft_strcmp_escape(sym->name, tmp->name, "_.", 1);
 			if (ret > 0)
 				swap_sym_list(sym, tmp);
-			else if (!ret && SYM_VALUE(sym->addr, class) > SYM_VALUE(tmp->addr, class))
+			else if (!ret && SYM_VALUE(sym->addr, class, endian) > SYM_VALUE(tmp->addr, class, endian))
 				swap_sym_list(sym, tmp);
 			tmp = tmp->next;
 		}
@@ -62,29 +62,29 @@ void	sort_sym_list(t_sym_list *sym, int class)
 	}
 }
 
-int	is_printable(void *addr, int class)
+int	is_printable(void *addr, int class, int endian)
 {
-	if (SYM_INFO(addr, class) == STT_FILE)
+	if (SYM_INFO(addr, class, endian) == STT_FILE)
 		return (0);
-	if (SYM_NAME(addr, class) == 0)
+	if (SYM_NAME(addr, class, endian) == 0)
 		return (0);
 	return (1);
 }
 
-t_sym_list	*init_sym_list(t_sym_section section, int class)
+t_sym_list	*init_sym_list(t_sym_section section, int class, int endian)
 {
 	t_sym_list	*sym_list;
 
 	if (!section.len)
 		return (NULL);
-	if  (!is_printable(section.symtab, class))
-		return (init_sym_list((t_sym_section) {NEXT_SYM(section.symtab, class), section.len - 1, section.strtab}, class));
+	if  (!is_printable(section.symtab, class, endian))
+		return (init_sym_list((t_sym_section) {NEXT_SYM(section.symtab, class), section.len - 1, section.strtab}, class, endian));
 	sym_list = malloc(sizeof(t_sym_list));
 	if (!sym_list)
 		return (NULL);
 	sym_list->addr = section.symtab;
-	sym_list->name = section.strtab + SYM_NAME(section.symtab, class);
-	sym_list->next = init_sym_list((t_sym_section) {NEXT_SYM(section.symtab, class), section.len - 1, section.strtab}, class);
+	sym_list->name = section.strtab + SYM_NAME(section.symtab, class, endian);
+	sym_list->next = init_sym_list((t_sym_section) {NEXT_SYM(section.symtab, class), section.len - 1, section.strtab}, class, endian);
 	return (sym_list);
 }
 

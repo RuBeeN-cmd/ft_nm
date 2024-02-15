@@ -20,11 +20,11 @@ void	print_value(uint64_t value, uint16_t shndx, uint64_t sym_value_size)
 	ft_printf(" ");	
 }
 
-void	print_letter(void *sym, void *shdr, uint16_t shnum, int class)
+void	print_letter(void *sym, void *shdr, uint16_t shnum, int class, int endian)
 {
 	uint8_t		type = SYM_TYPE(sym, class);
 	uint8_t		bind = SYM_BIND(sym, class);
-	uint16_t	shndx = SYM_SHNDX(sym, class);
+	uint16_t	shndx = SYM_SHNDX(sym, class, endian);
 
 	unsigned char c = '?';
 
@@ -51,8 +51,8 @@ void	print_letter(void *sym, void *shdr, uint16_t shnum, int class)
 				c = 'c';
 			else if (shndx < shnum)
 			{
-				uint32_t	sh_type = SH_TYPE(SH_INDEX(shdr, shndx, class), class);
-				uint64_t	sh_flags = SH_FLAGS(SH_INDEX(shdr, shndx, class), class);
+				uint32_t	sh_type = SH_TYPE(SH_INDEX(shdr, shndx, class), class, endian);
+				uint64_t	sh_flags = SH_FLAGS(SH_INDEX(shdr, shndx, class), class, endian);
 				if (sh_type == SHT_NOBITS
 					&& sh_flags == (SHF_ALLOC | SHF_WRITE))
 					c = 'b';
@@ -77,12 +77,12 @@ void	print_letter(void *sym, void *shdr, uint16_t shnum, int class)
 	ft_printf("%c ", c);
 }
 
-void	print_sym_list(t_sym_list *sym, void *shdr, uint16_t shnum, int class)
+void	print_sym_list(t_sym_list *sym, void *shdr, uint16_t shnum, int class, int endian)
 {
 	while (sym)
 	{
-		print_value(SYM_VALUE(sym->addr, class), SYM_SHNDX(sym->addr, class), SYM_VALUE_SIZE(class));
-		print_letter(sym->addr, shdr, shnum, class);
+		print_value(SYM_VALUE(sym->addr, class, endian), SYM_SHNDX(sym->addr, class, endian), SYM_VALUE_SIZE(class));
+		print_letter(sym->addr, shdr, shnum, class, endian);
 		ft_printf("%s\n", sym->name);
 		sym = sym->next;
 	}
