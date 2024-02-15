@@ -35,20 +35,11 @@ void	define_symtab(uint8_t *addr, t_elf *elf)
 		if (SH_TYPE(SH_INDEX(header, i, elf->class), elf->class) == SHT_SYMTAB)
 		{
 			elf->symtab.symtab = addr + SH_OFFSET(SH_INDEX(header, i, elf->class), elf->class);
-			elf->symtab.len = SH_SIZE(SH_INDEX(header, i, elf->class), elf->class) / sizeof(Elf64_Sym);
-		}
-		else if (SH_TYPE(SH_INDEX(header, i, elf->class), elf->class) == SHT_DYNSYM)
-		{
-			elf->dynsym.symtab = addr + SH_OFFSET(SH_INDEX(header, i, elf->class), elf->class);
-			elf->dynsym.len = SH_SIZE(SH_INDEX(header, i, elf->class), elf->class) / sizeof(Elf64_Sym);
+			elf->symtab.len = SH_SIZE(SH_INDEX(header, i, elf->class), elf->class) / SYM_SIZE(elf->class);
 		}
 		else if (SH_TYPE(SH_INDEX(header, i, elf->class), elf->class) == SHT_STRTAB)
-		{
 			if (!ft_strncmp(strtab + SH_NAME(SH_INDEX(header, i, elf->class), elf->class), ".strtab", 8))
 				elf->symtab.strtab = (char *) addr + SH_OFFSET(SH_INDEX(header, i, elf->class), elf->class);
-			else if  (!ft_strncmp(strtab + SH_NAME(SH_INDEX(header, i, elf->class), elf->class), ".dynstr", 8))
-				elf->dynsym.strtab = (char *) addr + SH_OFFSET(SH_INDEX(header, i, elf->class), elf->class);
-		}
 	}
 }
 
@@ -60,8 +51,37 @@ t_elf	init_elf(uint8_t *addr)
 		return (DEF_ELF);
 	ft_bzero(&elf, sizeof(t_elf));
 	set_elf_header_values(addr, &elf);
+	elf.shdr = addr + EH_SHOFF(addr, elf.class);
+	elf.shnum = EH_SHNUM(addr, elf.class);
 	define_symtab(addr, &elf);
 	return (elf);
+}
+
+void	swap_sym(Elf64_Sym *s1, Elf64_Sym *s2)
+{
+	Elf64_Sym	tmp;
+
+	tmp = *s1;
+	*s1 = *s2;
+	*s2 = tmp;
+}
+
+void	sort_symtab(t_sym_section symtab, int class)
+{
+	Elf64_Sym	*tmp;
+	Elf64_Sym	*sym = symtab.symtab;
+
+	if (!sym || !symtab.strtab)
+		return ;
+	for (uint64_t i = 0; i < symtab.len; i++)
+	{
+		tmp = sym + i;
+		for (uint64_t j = i + 1; j < symtab.len; j++)
+		{
+			if (ft_strcmp_escape(symtab.strtab + SYM_NAME(tmp, class), symtab.strtab + SYM_NAME(sym + j, class), "_", 1) > 0)
+				swap_sym(tmp, sym + j);
+		}
+	}
 }
 
 void	print_elf(t_elf elf)
@@ -69,8 +89,7 @@ void	print_elf(t_elf elf)
 	if (!elf.symtab.symtab || !elf.symtab.strtab)
 		return ;
 	t_sym_list	*all_sym = init_sym_list(elf.symtab, elf.class);
-	// sym_list_add_back(&all_sym, init_sym_list(elf.dynsym, elf.class));
-	sort_sym_list(all_sym);
-	print_sym_list(all_sym, elf.class);
+	sort_sym_list(all_sym, elf.class);
+	print_sym_list(all_sym, elf.shdr, elf.shnum, elf.class);
 	free_sym_list(all_sym);
 }
