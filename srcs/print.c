@@ -53,22 +53,18 @@ void	print_letter(void *sym, void *shdr, uint16_t shnum, int class, int endian)
 			{
 				uint32_t	sh_type = SH_TYPE(SH_INDEX(shdr, shndx, class), class, endian);
 				uint64_t	sh_flags = SH_FLAGS(SH_INDEX(shdr, shndx, class), class, endian);
-				if (sh_type == SHT_NOBITS
-					&& sh_flags == (SHF_ALLOC | SHF_WRITE))
+				if (sh_type == SHT_NOBITS)
 					c = 'b';
-				else if ((sh_type == SHT_PROGBITS || sh_type == SHT_REL || sh_type == SHT_HASH
-					|| sh_type == SHT_GNU_versym || sh_type == SHT_GNU_verdef || sh_type == SHT_STRTAB
-					|| sh_type == SHT_DYNSYM || sh_type == SHT_NOTE)
-					&& sh_flags == SHF_ALLOC)
-					c = 'r';
-				else if ((sh_type == SHT_PROGBITS
-					&& sh_flags == (SHF_ALLOC | SHF_WRITE))
-					|| sh_type == SHT_INIT_ARRAY || sh_type == SHT_FINI_ARRAY
-					|| sh_type == SHT_DYNAMIC)
+				else if (sh_flags == (SHF_ALLOC | SHF_WRITE))
 					c = 'd';
 				else if (sh_type == SHT_PROGBITS
 					&& sh_flags == (SHF_ALLOC | SHF_EXECINSTR))
 					c = 't';
+				else if ((sh_type == SHT_PROGBITS || sh_type == SHT_REL || sh_type == SHT_HASH
+					|| sh_type == SHT_GNU_versym || sh_type == SHT_GNU_verdef || sh_type == SHT_STRTAB
+					|| sh_type == SHT_DYNSYM || sh_type == SHT_NOTE)
+					&& sh_flags & SHF_ALLOC)
+					c = 'r';
 			}
 			if (bind == STB_GLOBAL && c != '?')
 				c -= 32;

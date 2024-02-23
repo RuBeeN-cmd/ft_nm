@@ -1,9 +1,10 @@
 #include "ft_nm.h"
 
-void	set_elf_header_values(unsigned char *header, t_elf *elf)
+void	set_elf_header_values(unsigned char *header, t_elf *elf, uint64_t size)
 {
 	elf->class = header[EI_CLASS];
 	elf->endian = header[EI_DATA];
+	elf->size = size;
 }
 
 int	check_elf_header(unsigned char *header)
@@ -21,15 +22,19 @@ int	check_elf_header(unsigned char *header)
 	return (0);
 }
 
-void	define_symtab(uint8_t *addr, t_elf *elf)
+int	define_symtab(uint8_t *addr, t_elf *elf)
 {
 	uint8_t		*header;
 	char		*strtab;
 
 	if (!addr || !elf)
-		return ;
+		return (1);
 	header = addr + EH_SHOFF(addr, elf->class, elf->endian);
-	strtab = (char *) (addr + SH_OFFSET(SH_INDEX(header, EH_SHSTRNDX(addr, elf->class, elf->endian), elf->class), elf->class, elf->endian));
+	void	*sh = SH_INDEX(header, EH_SHSTRNDX(addr, elf->class, elf->endian), elf->class);
+	if ((unsigned long) sh - (unsigned long) addr > elf->size)
+		return (1);
+	uint64_t	sh_offset = SH_OFFSET(sh, elf->class, elf->endian);
+	strtab = (char *) (addr + sh_offset);
 	for (uint16_t i = 0; i < EH_SHNUM(addr, elf->class, elf->endian); i++)
 	{
 		if (SH_TYPE(SH_INDEX(header, i, elf->class), elf->class, elf->endian) == SHT_SYMTAB)
@@ -38,26 +43,28 @@ void	define_symtab(uint8_t *addr, t_elf *elf)
 			elf->symtab.len = SH_SIZE(SH_INDEX(header, i, elf->class), elf->class, elf->endian) / SYM_SIZE(elf->class);
 		}
 		else if (SH_TYPE(SH_INDEX(header, i, elf->class), elf->class, elf->endian) == SHT_STRTAB)
+		{
 			if (!ft_strncmp(strtab + SH_NAME(SH_INDEX(header, i, elf->class), elf->class, elf->endian), ".strtab", 8))
 				elf->symtab.strtab = (char *) addr + SH_OFFSET(SH_INDEX(header, i, elf->class), elf->class, elf->endian);
+			if (!ft_strncmp(strtab + SH_NAME(SH_INDEX(header, i, elf->class), elf->class, elf->endian), ".shstrtab", 10))
+				elf->shstrtab = (char *) addr + SH_OFFSET(SH_INDEX(header, i, elf->class), elf->class, elf->endian);
+		}
 	}
-	return ;
+	return (0);
 }
 
-t_elf	init_elf(uint8_t *addr, char *file_path)
+t_elf	init_elf(uint8_t *addr, uint64_t size)
 {
 	t_elf	elf;
 
 	if (check_elf_header(addr))
-	{
-		print_error("file format not recognized", file_path, 0);
 		return (DEF_ELF);
-	}
 	ft_bzero(&elf, sizeof(t_elf));
-	set_elf_header_values(addr, &elf);
+	set_elf_header_values(addr, &elf, size);
 	elf.shdr = addr + EH_SHOFF(addr, elf.class, elf.endian);
 	elf.shnum = EH_SHNUM(addr, elf.class, elf.endian);
-	define_symtab(addr, &elf);
+	if (!elf.shnum || define_symtab(addr, &elf))
+		return (DEF_ELF);
 	return (elf);
 }
 

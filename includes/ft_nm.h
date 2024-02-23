@@ -15,7 +15,7 @@
 #define REVERSE_SORT	1 << 3 // -r, --reverse-sort
 #define NO_SORT			1 << 4 // -p, --no-sort
 
-#define SYM_INFO(sym, class, endian) (class == ELFCLASS32 ? ((Elf32_Sym *) sym)->st_info : ((Elf64_Sym *) sym)->st_info)
+#define SYM_INFO(sym, class) (class == ELFCLASS32 ? ((Elf32_Sym *) sym)->st_info : ((Elf64_Sym *) sym)->st_info)
 #define SYM_NAME(sym, class, endian) read_uint32(class == ELFCLASS32 ? ((Elf32_Sym *) sym)->st_name : ((Elf64_Sym *) sym)->st_name, endian)
 #define SYM_VALUE(sym, class, endian) (class == ELFCLASS32 ? read_uint32(((Elf32_Sym *) sym)->st_value, endian) : read_uint64(((Elf64_Sym *) sym)->st_value, endian))
 #define SYM_VALUE_SIZE(class) (class == ELFCLASS32 ? sizeof(uint32_t) : sizeof(uint64_t))
@@ -36,7 +36,7 @@
 #define SH_NAME(shdr, class, endian) read_uint32(class == ELFCLASS32 ? ((Elf32_Shdr *) shdr)->sh_name : ((Elf64_Shdr *) shdr)->sh_name, endian)
 #define SH_FLAGS(shdr, class, endian) (class == ELFCLASS32 ? read_uint32(((Elf32_Shdr *) shdr)->sh_flags, endian) : read_uint64(((Elf64_Shdr *) shdr)->sh_flags, endian))
 
-#define DEF_ELF ((t_elf) {0, 0, NULL, 0, (t_sym_section) {NULL, 0, NULL}})
+#define DEF_ELF ((t_elf) {0, 0, 0, NULL, 0, (t_sym_section) {NULL, 0, NULL}, NULL})
 
 typedef struct	s_sym_section
 {
@@ -49,9 +49,11 @@ typedef struct	s_elf
 {
 	uint8_t			class;
 	uint8_t			endian;
+	uint64_t		size;
 	void			*shdr;
 	uint16_t		shnum;
 	t_sym_section	symtab;
+	char			*shstrtab;
 }				t_elf;
 
 typedef struct	s_sym_list
@@ -65,8 +67,8 @@ typedef struct	s_sym_list
 int	parse_flags(int argc, char *argv[]);
 
 // elf.c
-t_elf	init_elf(uint8_t *addr, char *file_path);
-void	define_symtab(uint8_t *addr, t_elf *elf);
+t_elf	init_elf(uint8_t *addr, uint64_t size);
+int		define_symtab(uint8_t *addr, t_elf *elf);
 void	print_elf(t_elf elf, char *file_path);
 
 // sym_list.c

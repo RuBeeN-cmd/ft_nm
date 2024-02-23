@@ -33,7 +33,7 @@ int     ft_strcmp_escape(char *n1, char *n2, char *set, int lower)
                 while (n2[j] && ft_strchr(set, n2[j]))
                         j++;
         }
-		if (!n1[i] && !n2[j])
+		if (set && *set && !n1[i] && !n2[j])
 			return (ft_strcmp_escape(n1, n2, "", lower));
 		if (lower)
 			return (ft_tolower(n1[i]) - ft_tolower(n2[j]));
@@ -51,7 +51,7 @@ void	sort_sym_list(t_sym_list *sym, int class, int endian)
 		tmp = sym->next;
 		while (tmp)
 		{
-			ret = ft_strcmp_escape(sym->name, tmp->name, "_.", 1);
+			ret = ft_strcmp_escape(sym->name, tmp->name, "_.@", 1);
 			if (ret > 0)
 				swap_sym_list(sym, tmp);
 			else if (!ret && SYM_VALUE(sym->addr, class, endian) > SYM_VALUE(tmp->addr, class, endian))
@@ -64,7 +64,7 @@ void	sort_sym_list(t_sym_list *sym, int class, int endian)
 
 int	is_printable(void *addr, int class, int endian)
 {
-	if (SYM_INFO(addr, class, endian) == STT_FILE)
+	if (SYM_INFO(addr, class) == STT_FILE)
 		return (0);
 	if (SYM_NAME(addr, class, endian) == 0)
 		return (0);

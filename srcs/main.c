@@ -41,7 +41,7 @@ void	*map_file(char path[], unsigned long *size_buf)
 
 int	list_symbols(char path[], int flags, int multiple_files)
 {
-	unsigned long	size;
+	uint64_t		size;
 	void			*addr;
 	t_elf			elf;
 	(void) flags;
@@ -51,9 +51,10 @@ int	list_symbols(char path[], int flags, int multiple_files)
 	addr = map_file(path, &size);
 	if (!addr)
 		return (1);
-	elf = init_elf(addr, path);
+	elf = init_elf(addr, size);
 	if (!ft_memcmp(&elf, &DEF_ELF, sizeof(t_elf)))
 	{
+		print_error("file format not recognized", path, 0);
 		munmap(addr, size);
 		return (1);
 	}
