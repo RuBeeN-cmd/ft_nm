@@ -53,13 +53,14 @@ int	define_symtab(uint8_t *addr, t_elf *elf)
 	return (0);
 }
 
-t_elf	init_elf(uint8_t *addr, uint64_t size)
+t_elf	init_elf(uint8_t *addr, uint64_t size, int flags)
 {
 	t_elf	elf;
 
 	if (check_elf_header(addr))
 		return (DEF_ELF);
 	ft_bzero(&elf, sizeof(t_elf));
+	elf.flags = flags;
 	set_elf_header_values(addr, &elf, size);
 	elf.shdr = addr + EH_SHOFF(addr, elf.class, elf.endian);
 	elf.shnum = EH_SHNUM(addr, elf.class, elf.endian);
@@ -102,8 +103,9 @@ void	print_elf(t_elf elf, char *file_path)
 		print_error("no symbols", file_path, 0);
 		return ;
 	}
-	t_sym_list	*all_sym = init_sym_list(elf.symtab, elf.class, elf.endian);
-	sort_sym_list(all_sym, elf.class, elf.endian);
+	t_sym_list	*all_sym = init_sym_list(elf.symtab, elf.class, elf.endian, elf.flags, elf.shdr, elf.shstrtab);
+	if (!(elf.flags & NO_SORT))
+		sort_sym_list(all_sym, elf.class, elf.endian, elf.flags & REVERSE_SORT);
 	print_sym_list(all_sym, elf.shdr, elf.shnum, elf.class, elf.endian);
 	free_sym_list(all_sym);
 	return ;

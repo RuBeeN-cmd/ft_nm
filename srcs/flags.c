@@ -4,19 +4,15 @@ int	get_long_flag(char str[])
 {
 	if (!str)
 		return (-1);
-	char	*flags_str[6] = {
-		"debug-syms", "extern-only", "undefined-only",
-		"reverse-sort", "no-sort"
-	};
-	for (int i = 0; flags_str[i]; i++)
-		if (!ft_strncmp(str, flags_str[i], -1))
+	for (int i = 0; i < FLAGS_NB; i++)
+		if (!ft_strncmp(str, LONG_FLAGS[i], -1))
 			return (1 << i);
 	return (-1);
 }
 
 int	get_short_flag(char c)
 {
-	char	flags_letter[] = "agurp";
+	char	flags_letter[] = "agurph";
 
 	char	*flag_ptr = ft_strchr(flags_letter, c);
 	if (!flag_ptr)

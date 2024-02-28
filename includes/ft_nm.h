@@ -9,11 +9,28 @@
 #include <stdio.h>
 #include <elf.h>
 
-#define DEBUG_SYMS		1 << 0 // -a, --debug-syms
-#define EXTERN_ONLY		1 << 1 // -g, --extern-only
-#define UNDEFINED_ONLY	1 << 2 // -u, --undefined-only
-#define REVERSE_SORT	1 << 3 // -r, --reverse-sort
-#define NO_SORT			1 << 4 // -p, --no-sort
+#define FLAGS_NB 6
+#define FLAGS "agurph"
+#define LONG_FLAGS (char *[]) { "debug-syms", "extern-only", "undefined-only", "reverse-sort", "no-sort", "help" }
+
+#define DEBUG_SYMS		1 << 0
+#define EXTERN_ONLY		1 << 1
+#define UNDEFINED_ONLY	1 << 2
+#define REVERSE_SORT	1 << 3
+#define NO_SORT			1 << 4
+#define HELP			1 << 5
+
+#define USAGE "\
+Usage: nm [option(s)] [file(s)]\n\
+ List symbols in [file(s)] (a.out by default).\n\
+ The options are:\n\
+  -a, --debug-syms       Display debugger-only symbols\n\
+  -g, --extern-only      Display only external symbols\n\
+  -p, --no-sort          Do not sort the symbols\n\
+  -r, --reverse-sort     Reverse the sense of the sort\n\
+  -u, --undefined-only   Display only undefined symbols\n\
+  -h, --help             Display this information\n\
+"
 
 #define SYM_INFO(sym, class) (class == ELFCLASS32 ? ((Elf32_Sym *) sym)->st_info : ((Elf64_Sym *) sym)->st_info)
 #define SYM_NAME(sym, class, endian) read_uint32(class == ELFCLASS32 ? ((Elf32_Sym *) sym)->st_name : ((Elf64_Sym *) sym)->st_name, endian)
@@ -23,6 +40,7 @@
 #define SYM_SHNDX(sym, class, endian) read_uint16(class == ELFCLASS32 ? ((Elf32_Sym *) sym)->st_shndx : ((Elf64_Sym *) sym)->st_shndx, endian)
 #define SYM_BIND(sym, class) (class == ELFCLASS32 ? ELF32_ST_BIND(((Elf32_Sym *) sym)->st_info) : ELF64_ST_BIND(((Elf64_Sym *) sym)->st_info))
 #define SYM_TYPE(sym, class) (class == ELFCLASS32 ? ELF32_ST_TYPE(((Elf32_Sym *) sym)->st_info) : ELF64_ST_TYPE(((Elf64_Sym *) sym)->st_info))
+#define SYM_VISIBILITY(sym, class) (class == ELFCLASS32 ? ELF32_ST_VISIBILITY(((Elf32_Sym *) sym)->st_other) : ELF64_ST_VISIBILITY(((Elf64_Sym *) sym)->st_other))
 #define NEXT_SYM(sym, class) (class == ELFCLASS32 ? (void *) (((Elf32_Sym *) sym) + 1) : (void *) (((Elf64_Sym *) sym) + 1))
 
 #define EH_SHOFF(ehdr, class, endian) (class == ELFCLASS32 ? read_uint32(((Elf32_Ehdr *) ehdr)->e_shoff, endian) : read_uint64(((Elf64_Ehdr *) ehdr)->e_shoff, endian))
@@ -36,7 +54,10 @@
 #define SH_NAME(shdr, class, endian) read_uint32(class == ELFCLASS32 ? ((Elf32_Shdr *) shdr)->sh_name : ((Elf64_Shdr *) shdr)->sh_name, endian)
 #define SH_FLAGS(shdr, class, endian) (class == ELFCLASS32 ? read_uint32(((Elf32_Shdr *) shdr)->sh_flags, endian) : read_uint64(((Elf64_Shdr *) shdr)->sh_flags, endian))
 
-#define DEF_ELF ((t_elf) {0, 0, 0, NULL, 0, (t_sym_section) {NULL, 0, NULL}, NULL})
+#define DEF_SYM ((Elf64_Sym) {0})
+#define DEF_ELF ((t_elf) {0})
+
+
 
 typedef struct	s_sym_section
 {
@@ -47,6 +68,7 @@ typedef struct	s_sym_section
 
 typedef struct	s_elf
 {
+	int				flags;
 	uint8_t			class;
 	uint8_t			endian;
 	uint64_t		size;
@@ -67,14 +89,14 @@ typedef struct	s_sym_list
 int	parse_flags(int argc, char *argv[]);
 
 // elf.c
-t_elf	init_elf(uint8_t *addr, uint64_t size);
+t_elf	init_elf(uint8_t *addr, uint64_t size, int flags);
 int		define_symtab(uint8_t *addr, t_elf *elf);
 void	print_elf(t_elf elf, char *file_path);
 
 // sym_list.c
-t_sym_list	*init_sym_list(t_sym_section section, int class, int endian);
+t_sym_list	*init_sym_list(t_sym_section section, int class, int endian, int flags, void *shdr, char *shstrtab);
 void		free_sym_list(t_sym_list *sym_list);
-void		sort_sym_list(t_sym_list *sym, int class, int endian);
+void		sort_sym_list(t_sym_list *sym, int class, int endian, int reverse);
 int     	ft_strcmp_escape(char *n1, char *n2, char *set, int lower);
 
 // error.c

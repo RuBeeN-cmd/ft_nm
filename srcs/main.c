@@ -39,22 +39,21 @@ void	*map_file(char path[], unsigned long *size_buf)
 	return (addr);
 }
 
-int	list_symbols(char path[], int flags, int multiple_files)
+int	list_file_symbols(char path[], int flags, int multiple_files)
 {
 	uint64_t		size;
 	void			*addr;
 	t_elf			elf;
-	(void) flags;
 
 	if (!path)
 		return (1);
 	addr = map_file(path, &size);
 	if (!addr)
 		return (1);
-	elf = init_elf(addr, size);
+	elf = init_elf(addr, size, flags);
 	if (!ft_memcmp(&elf, &DEF_ELF, sizeof(t_elf)))
 	{
-		print_error("file format not recognized", path, 0);
+		print_error("file format not recognized", path, 0);	
 		munmap(addr, size);
 		return (1);
 	}
@@ -71,13 +70,18 @@ int	main(int argc, char *argv[])
 	int	flags = parse_flags(argc - 1, argv + 1);
 	if (flags == -1)
 		return (1);
+	if (flags & HELP)
+	{
+		ft_printf(USAGE);
+		return (0);
+	}
 	int argc_left = get_argc_left(argc - 1, argv + 1);
 	if (!argc_left)
-		return (list_symbols("a.out", flags, 0));
+		return (list_file_symbols("a.out", flags, 0));
 	int	ret = 0;
 	for (int i = 1; i < argc; i++)
 		if (argv[i])
-			if (list_symbols(argv[i], flags, argc_left > 1))
+			if (list_file_symbols(argv[i], flags, argc_left > 1))
 				ret = 1;
 	return (ret);
 }
