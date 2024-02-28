@@ -11,7 +11,7 @@ SRC = main.c \
 		elf.c \
 		sym_list.c \
 		error.c \
-		read.c \
+		read_uint.c \
 		print.c
 OBJ = $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))
 

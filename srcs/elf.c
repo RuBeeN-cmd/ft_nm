@@ -69,33 +69,6 @@ t_elf	init_elf(uint8_t *addr, uint64_t size, int flags)
 	return (elf);
 }
 
-void	swap_sym(Elf64_Sym *s1, Elf64_Sym *s2)
-{
-	Elf64_Sym	tmp;
-
-	tmp = *s1;
-	*s1 = *s2;
-	*s2 = tmp;
-}
-
-void	sort_symtab(t_sym_section symtab, int class, int endian)
-{
-	Elf64_Sym	*tmp;
-	Elf64_Sym	*sym = symtab.symtab;
-
-	if (!sym || !symtab.strtab)
-		return ;
-	for (uint64_t i = 0; i < symtab.len; i++)
-	{
-		tmp = sym + i;
-		for (uint64_t j = i + 1; j < symtab.len; j++)
-		{
-			if (ft_strcmp_escape(symtab.strtab + SYM_NAME(tmp, class, endian), symtab.strtab + SYM_NAME(sym + j, class, endian), "_", 1) > 0)
-				swap_sym(tmp, sym + j);
-		}
-	}
-}
-
 void	print_elf(t_elf elf, char *file_path)
 {
 	if (!elf.symtab.symtab || !elf.symtab.strtab)
