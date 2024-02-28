@@ -76,7 +76,7 @@ int	is_printable(void *addr, int class, int endian, int flags)
 		return (0);
 	if (flags & UNDEFINED_ONLY && SYM_SHNDX(addr, class, endian) != SHN_UNDEF)
 		return (0);
-	if (!ft_memcmp(addr, &DEF_SYM, SYM_SIZE(class)))
+	if (!ft_memcmp(addr, &DEF_SYM, SYM_SSIZE(class)))
 		return (0);
 	return (1);
 }

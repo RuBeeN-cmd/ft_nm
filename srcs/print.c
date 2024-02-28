@@ -154,7 +154,7 @@ void	print_sym_list(t_sym_list *sym, void *shdr, uint16_t shnum, int class, int 
 {
 	while (sym)
 	{
-		print_value(SYM_VALUE(sym->addr, class, endian), SYM_SHNDX(sym->addr, class, endian), SYM_VALUE_SIZE(class));
+		print_value(SYM_VALUE(sym->addr, class, endian), SYM_SHNDX(sym->addr, class, endian), SYM_VALUE_SSIZE(class));
 		print_letter(sym->addr, shdr, shnum, class, endian);
 		ft_printf("%s\n", sym->name);
 		sym = sym->next;

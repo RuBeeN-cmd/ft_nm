@@ -23,7 +23,8 @@ void	*map_file(char path[], unsigned long *size_buf)
 	fd = open(path, O_RDONLY);
 	if (fd == -1)
 	{
-		print_error("No such file", path, 1);
+		if (errno == ENOENT)
+			print_error("No such file", path, 1);
 		return (NULL);
 	}
 	if (fstat(fd, &stat_buf) == -1)
