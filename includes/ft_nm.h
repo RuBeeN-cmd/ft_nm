@@ -20,6 +20,10 @@ typedef struct s_sym_list		t_sym_list;
 #define DEF_SYM ((Elf64_Sym) {0})
 #define DEF_ELF ((t_elf) {0})
 
+/**
+ * @struct		s_sym_section
+ * @brief		Structure to hold the symbol table and string table
+ */
 struct	s_sym_section
 {
 	void		*symtab;
@@ -27,6 +31,10 @@ struct	s_sym_section
 	char		*strtab;
 };
 
+/**
+ * @struct		s_elf
+ * @brief		Structure to hold the information of an elf file
+ */
 struct	s_elf
 {
 	int				flags;
@@ -40,6 +48,10 @@ struct	s_elf
 };
 
 
+/**
+ * @struct		s_sym_list
+ * @brief		Structure to hold a list of symbols
+ */
 struct	s_sym_list
 {
 	char				*name;

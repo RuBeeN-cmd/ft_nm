@@ -39,6 +39,4 @@
 #define SH_NAME(shdr, class, endian) read_uint32(class == ELFCLASS32 ? ((Elf32_Shdr *) shdr)->sh_name : ((Elf64_Shdr *) shdr)->sh_name, endian)
 #define SH_FLAGS(shdr, class, endian) (class == ELFCLASS32 ? read_uint32(((Elf32_Shdr *) shdr)->sh_flags, endian) : read_uint64(((Elf64_Shdr *) shdr)->sh_flags, endian))
 
-
-
 #endif
