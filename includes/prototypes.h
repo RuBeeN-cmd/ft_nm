@@ -8,7 +8,7 @@ int	parse_flags(int argc, char *argv[]);
 
 // elf.c
 t_elf	init_elf(uint8_t *addr, uint64_t size, int flags);
-int		define_symtab(uint8_t *addr, t_elf *elf);
+int		define_shdr(uint8_t *addr, t_elf *elf);
 void	print_elf(t_elf elf, char *file_path);
 
 // sym_list.c
