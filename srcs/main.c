@@ -1,5 +1,11 @@
 #include "ft_nm.h"
 
+/**
+ * @brief		Parse the flags from the command line
+ * @param[in]	argc The number of arguments
+ * @param[in]	argv The arguments
+ * @return		The flags parsed from the command line
+ */
 int	get_argc_left(int argc, char *argv[])
 {
 	if (argc < 0 || !argv)
@@ -11,6 +17,12 @@ int	get_argc_left(int argc, char *argv[])
 	return (ret);
 }
 
+/**
+ * @brief		Map a file into memory
+ * @param[in]	path The path to the file to map
+ * @param[out]	size_buf A pointer to an unsigned long to store the size of the file
+ * @return		A pointer to the mapped file, or NULL if an error occurred
+ */
 void	*map_file(char path[], unsigned long *size_buf)
 {
 	void		*addr;
@@ -40,6 +52,13 @@ void	*map_file(char path[], unsigned long *size_buf)
 	return (addr);
 }
 
+/**
+ * @brief		Print the symbols of a file
+ * @param[in]	path The path to the file to print
+ * @param[in]	flags The flags to use
+ * @param[in]	multiple_files Whether or not multiple files are being printed
+ * @return		0 if the symbols were printed successfully, 1 otherwise
+ */
 int	list_file_symbols(char path[], int flags, int multiple_files)
 {
 	uint64_t		size;

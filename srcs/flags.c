@@ -1,5 +1,10 @@
 #include "ft_nm.h"
 
+/**
+ * @brief		Get the long flag from a string
+ * @param[in]	str The string to parse
+ * @return		The flag parsed
+ */
 int	get_long_flag(char str[])
 {
 	if (!str)
@@ -10,6 +15,11 @@ int	get_long_flag(char str[])
 	return (-1);
 }
 
+/**
+ * @brief			Get the flags from a char
+ * @param[in]		c The char to parse
+ * @return			The flag parsed
+ */
 int	get_short_flag(char c)
 {
 	char	flags_letter[] = "agurph";
@@ -20,6 +30,11 @@ int	get_short_flag(char c)
 	return (1 << (flag_ptr - flags_letter));
 }
 
+/**
+ * @brief			Get the flags from a string
+ * @param[in]		str The string to parse
+ * @return			The flags parsed
+ */
 int	get_short_flags(char str[])
 {
 	if (!str)
@@ -35,6 +50,12 @@ int	get_short_flags(char str[])
 	return (flags);
 }
 
+/**
+ * @brief			Parse the flags, and remove them from the arguments
+ * @param[in]		argc The number of arguments
+ * @param[in,out]	argv The arguments
+ * @return			The flags parsed
+ */
 int	parse_flags(int argc, char *argv[])
 {
 	int	flags = 0;

@@ -1,5 +1,12 @@
 #include "ft_nm.h"
 
+/**
+ * @brief		Set the values of the elf structure
+ * @param[in]	header The header to use
+ * @param[out]	elf The elf structure to fill
+ * @param[in]	size The size of the file
+ * @param[in]	flags The flags to use
+ */
 void	set_elf_values(unsigned char *header, t_elf *elf, uint64_t size, int flags)
 {
 	elf->flags = flags;
@@ -8,6 +15,12 @@ void	set_elf_values(unsigned char *header, t_elf *elf, uint64_t size, int flags)
 	elf->size = size;
 }
 
+/**
+ * @brief		Check the elf header identification
+ * @param[in]	header The header to check
+ * @param[in]	size The size of the header
+ * @return		0 on success, 1 on error
+ */
 int	check_ident(unsigned char *header, uint64_t size)
 {
 	if (!header || size < EI_NIDENT)
@@ -25,6 +38,12 @@ int	check_ident(unsigned char *header, uint64_t size)
 	return (0);
 }
 
+/**
+ * @brief		Check the elf header
+ * @param[in]	hdr The header to check
+ * @param[in]	size The size of the header
+ * @return		0 on success, 1 on error 
+ */
 int	check_elf_header(void *hdr, uint64_t size)
 {
 	uint8_t	class;
@@ -42,7 +61,13 @@ int	check_elf_header(void *hdr, uint64_t size)
 	return (0);
 }
 
-int	define_symtab(uint8_t *addr, t_elf *elf)
+/**
+ * @brief		Find the section header string table and the symbol table
+ * @param[in]	addr The address of the mapped file
+ * @param[out]	elf The elf structure to fill
+ * @return		0 on success, 1 on error
+ */
+int	define_shdr(uint8_t *addr, t_elf *elf)
 {
 	uint8_t		*header;
 	char		*strtab;
@@ -73,6 +98,13 @@ int	define_symtab(uint8_t *addr, t_elf *elf)
 	return (0);
 }
 
+/**
+ * @brief		Initialize an elf structure
+ * @param[in]	addr The address of the mapped file
+ * @param[in]	size The size of the mapped file
+ * @param[in]	flags The flags to use
+ * @return		The initialized elf structure
+ */
 t_elf	init_elf(uint8_t *addr, uint64_t size, int flags)
 {
 	t_elf	elf;
@@ -85,11 +117,16 @@ t_elf	init_elf(uint8_t *addr, uint64_t size, int flags)
 	set_elf_values(addr, &elf, size, flags);
 	elf.shdr = addr + EH_SHOFF(addr, elf.class, elf.endian);
 	elf.shnum = EH_SHNUM(addr, elf.class, elf.endian);
-	if (!elf.shnum || define_symtab(addr, &elf))
+	if (!elf.shnum || define_shdr(addr, &elf))
 		return (DEF_ELF);
 	return (elf);
 }
 
+/**
+ * @brief		Print the symbols of an elf file
+ * @param[in]	elf The elf structure to print
+ * @param[in]	file_path The path to the file to print
+ */
 void	print_elf(t_elf elf, char *file_path)
 {
 	if (!elf.symtab.symtab || !elf.symtab.strtab)

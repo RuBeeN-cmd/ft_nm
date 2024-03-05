@@ -1,5 +1,10 @@
 #include "ft_nm.h"
 
+/**
+ * @brief		Swap two symbol list elements
+ * @param[in]	a The first element to swap
+ * @param[in]	b The second element to swap
+ */
 void	swap_sym_list(t_sym_list *a, t_sym_list *b)
 {
 	char		*tmp_name;
@@ -13,6 +18,14 @@ void	swap_sym_list(t_sym_list *a, t_sym_list *b)
 	b->addr = tmp_addr;
 }
 
+/**
+ * @brief		Compare two strings with an escape set
+ * @param[in]	n1 The first string to compare
+ * @param[in]	n2 The second string to compare
+ * @param[in]	set The escape set
+ * @param[in]	lower The lower flag
+ * @return		The difference between the two strings
+ */
 int     ft_strcmp_escape(char *n1, char *n2, char *set, int lower)
 {
         if (!n1 || !n2)
@@ -40,6 +53,13 @@ int     ft_strcmp_escape(char *n1, char *n2, char *set, int lower)
 		return (n1[i] - n2[j]);
 }
 
+/**
+ * @brief		Sort a symbol list
+ * @param[in]	sym The symbol list to sort
+ * @param[in]	class The class of the elf file
+ * @param[in]	endian The endian of the elf file
+ * @param[in]	reverse The reverse flag
+ */
 void	sort_sym_list(t_sym_list *sym, int class, int endian, int reverse)
 {
 	t_sym_list	*tmp;
@@ -52,7 +72,7 @@ void	sort_sym_list(t_sym_list *sym, int class, int endian, int reverse)
 		tmp = sym->next;
 		while (tmp)
 		{
-			ret = ft_strcmp_escape(sym->name, tmp->name, "_.@", 1);
+			ret = ft_strcmp_escape(sym->name, tmp->name, "", 0);
 			if (!ret)
 			{
 				sym_value = SYM_VALUE(sym->addr, class, endian);
@@ -67,6 +87,14 @@ void	sort_sym_list(t_sym_list *sym, int class, int endian, int reverse)
 	}
 }
 
+/**
+ * @brief		Check if a symbol is printable
+ * @param[in]	addr The address of the symbol
+ * @param[in]	class The class of the elf file
+ * @param[in]	endian The endian of the elf file
+ * @param[in]	flags The flags to use
+ * @return		1 if the symbol is printable, 0 otherwise
+ */
 int	is_printable(void *addr, int class, int endian, int flags)
 {
 	if (!(flags & DEBUG_SYMS)
@@ -81,6 +109,16 @@ int	is_printable(void *addr, int class, int endian, int flags)
 	return (1);
 }
 
+/**
+ * @brief		Initialize a symbol list
+ * @param[in]	section The section to use
+ * @param[in]	class The class of the elf file
+ * @param[in]	endian The endian of the elf file
+ * @param[in]	flags The flags to use
+ * @param[in]	shdr The section headers of the elf file
+ * @param[in]	shstrtab The section header string table of the elf file
+ * @return		The initialized symbol list
+ */
 t_sym_list	*init_sym_list(t_sym_section section, int class, int endian, int flags, void *shdr, char *shstrtab)
 {
 	t_sym_list	*sym_list;
@@ -101,6 +139,10 @@ t_sym_list	*init_sym_list(t_sym_section section, int class, int endian, int flag
 	return (sym_list);
 }
 
+/**
+ * @brief		Free a symbol list
+ * @param[in]	sym_list The symbol list to free
+ */
 void	free_sym_list(t_sym_list *sym_list)
 {
 	if (!sym_list)

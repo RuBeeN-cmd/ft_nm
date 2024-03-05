@@ -1,5 +1,11 @@
 #include "ft_nm.h"
 
+/**
+ * @brief		Print the value of a symbol
+ * @param[in]	value The value to print
+ * @param[in]	shndx The section index of the symbol
+ * @param[in]	sym_value_size The size of the symbol value
+ */
 void	print_value(uint64_t value, uint16_t shndx, uint64_t sym_value_size)
 {
 	if (shndx == SHN_UNDEF)
@@ -9,7 +15,7 @@ void	print_value(uint64_t value, uint16_t shndx, uint64_t sym_value_size)
 	{
 		for (int i = 0; i < (int) (sym_value_size << 1); i++)
 		{
-			if (!(value & (0xful << (((sym_value_size << 1) - i - 1) * 4))))
+			if (!(value & (0xful << (((sym_value_size << 1) - i - 1) << 2))))
 				ft_printf("0");
 			else
 				break ;
@@ -17,9 +23,17 @@ void	print_value(uint64_t value, uint16_t shndx, uint64_t sym_value_size)
 		if (value)
 			ft_printf("%x", value);
 	}	
-	ft_printf(" ");	
+	ft_printf(" ");
 }
 
+/**
+ * @brief		Print the letter of a symbol
+ * @param[in]	sym The symbol to print
+ * @param[in]	shdr The section header to use
+ * @param[in]	shnum The number of section headers
+ * @param[in]	class The class of the elf file
+ * @param[in]	endian The endian of the elf file
+ */
 void	print_letter(void *sym, void *shdr, uint16_t shnum, int class, int endian)
 {
 	uint8_t		type = SYM_TYPE(sym, class);
@@ -70,86 +84,17 @@ void	print_letter(void *sym, void *shdr, uint16_t shnum, int class, int endian)
 				c -= 32;
 		}
 	}
-	// if (c == '?')
-	// {
-	// 	uint32_t	sh_type = SH_TYPE(SH_INDEX(shdr, shndx, class), class, endian);
-	// 	ft_printf("\n-- Type ");
-	// 	if (sh_type == SHT_NULL)
-	// 		ft_printf("SHT_NULL --\n");
-	// 	else if (sh_type == SHT_PROGBITS)
-	// 		ft_printf("SHT_PROGBITS --\n");
-	// 	else if (sh_type == SHT_SYMTAB)
-	// 		ft_printf("SHT_SYMTAB --\n");
-	// 	else if (sh_type == SHT_STRTAB)
-	// 		ft_printf("SHT_STRTAB --\n");
-	// 	else if (sh_type == SHT_RELA)
-	// 		ft_printf("SHT_RELA --\n");
-	// 	else if (sh_type == SHT_HASH)
-	// 		ft_printf("SHT_HASH --\n");
-	// 	else if (sh_type == SHT_DYNAMIC)
-	// 		ft_printf("SHT_DYNAMIC --\n");
-	// 	else if (sh_type == SHT_NOTE)
-	// 		ft_printf("SHT_NOTE --\n");
-	// 	else if (sh_type == SHT_NOBITS)
-	// 		ft_printf("SHT_NOBITS --\n");
-	// 	else if (sh_type == SHT_REL)
-	// 		ft_printf("SHT_REL --\n");
-	// 	else if (sh_type == SHT_SHLIB)
-	// 		ft_printf("SHT_SHLIB --\n");
-	// 	else if (sh_type == SHT_DYNSYM)
-	// 		ft_printf("SHT_DYNSYM --\n");
-	// 	else if (sh_type == SHT_INIT_ARRAY)
-	// 		ft_printf("SHT_INIT_ARRAY --\n");
-	// 	else if (sh_type == SHT_FINI_ARRAY)
-	// 		ft_printf("SHT_FINI_ARRAY --\n");
-	// 	else if (sh_type == SHT_PREINIT_ARRAY)
-	// 		ft_printf("SHT_PREINIT_ARRAY --\n");
-	// 	else if (sh_type == SHT_GROUP)
-	// 		ft_printf("SHT_GROUP --\n");
-	// 	else if (sh_type == SHT_SYMTAB_SHNDX)
-	// 		ft_printf("SHT_SYMTAB_SHNDX --\n");
-	// 	else if (sh_type == SHT_NUM)
-	// 		ft_printf("SHT_NUM --\n");
-	// 	else if (sh_type == SHT_LOOS)
-	// 		ft_printf("SHT_LOOS --\n");
-	// 	else if (sh_type == SHT_GNU_ATTRIBUTES)
-	// 		ft_printf("SHT_GNU_ATTRIBUTES --\n");
-	// 	else if (sh_type == SHT_GNU_HASH)
-	// 		ft_printf("SHT_GNU_HASH --\n");
-	// 	else if (sh_type == SHT_GNU_LIBLIST)
-	// 		ft_printf("SHT_GNU_LIBLIST --\n");
-	// 	else if (sh_type == SHT_CHECKSUM)
-	// 		ft_printf("SHT_CHECKSUM --\n");
-	// 	else if (sh_type == SHT_LOSUNW)
-	// 		ft_printf("SHT_LOSUNW --\n");
-	// 	else if (sh_type == SHT_SUNW_move)
-	// 		ft_printf("SHT_SUNW_move --\n");
-	// 	else if (sh_type == SHT_SUNW_COMDAT)
-	// 		ft_printf("SHT_SUNW_COMDAT --\n");
-	// 	else if (sh_type == SHT_SUNW_syminfo)
-	// 		ft_printf("SHT_SUNW_syminfo --\n");
-	// 	else if (sh_type == SHT_GNU_verdef)
-	// 		ft_printf("SHT_GNU_verdef --\n");
-	// 	else if (sh_type == SHT_GNU_verneed)
-	// 		ft_printf("SHT_GNU_verneed --\n");
-	// 	else if (sh_type == SHT_GNU_versym)
-	// 		ft_printf("SHT_GNU_versym --\n");
-	// 	else if (sh_type == SHT_HISUNW)
-	// 		ft_printf("SHT_HISUNW --\n");
-	// 	else if (sh_type == SHT_HIOS)
-	// 		ft_printf("SHT_HIOS --\n");
-	// 	else if (sh_type == SHT_LOPROC)
-	// 		ft_printf("SHT_LOPROC --\n");
-	// 	else if (sh_type == SHT_HIPROC)
-	// 		ft_printf("SHT_HIPROC --\n");
-	// 	else if (sh_type == SHT_LOUSER)
-	// 		ft_printf("SHT_LOUSER --\n");
-	// 	else if (sh_type == SHT_HIUSER)
-	// 		ft_printf("SHT_HIUSER --\n");
-	// }
 	ft_printf("%c ", c);
 }
 
+/**
+ * @brief		Print the symbols of a file
+ * @param[in]	sym The symbol list to print
+ * @param[in]	shdr The section header to use
+ * @param[in]	shnum The number of section headers
+ * @param[in]	class The class of the elf file
+ * @param[in]	endian The endian of the elf file
+ */
 void	print_sym_list(t_sym_list *sym, void *shdr, uint16_t shnum, int class, int endian)
 {
 	while (sym)
