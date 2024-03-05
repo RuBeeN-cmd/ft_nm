@@ -39,6 +39,8 @@ int	check_elf_header(void *hdr, uint64_t size)
 	if (EH_SHOFF(hdr, class, endian)
 		+ EH_SHNUM(hdr, class, endian) * SH_SSIZE(class) > size)
 		return (1);
+	if (EH_SHENTSIZE(hdr, class, endian) != SH_SSIZE(class))
+		return (1);
 	return (0);
 }
 

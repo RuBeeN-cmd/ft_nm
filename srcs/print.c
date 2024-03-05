@@ -60,10 +60,8 @@ void	print_letter(void *sym, void *shdr, uint16_t shnum, int class, int endian)
 				else if (sh_type == SHT_PROGBITS
 					&& sh_flags == (SHF_ALLOC | SHF_EXECINSTR))
 					c = 't';
-				else if ((sh_type == SHT_PROGBITS || sh_type == SHT_REL || sh_type == SHT_HASH
-					|| sh_type == SHT_GNU_versym || sh_type == SHT_GNU_verdef || sh_type == SHT_STRTAB
-					|| sh_type == SHT_DYNSYM || sh_type == SHT_NOTE)
-					&& sh_flags & SHF_ALLOC)
+				else if ((sh_flags & SHF_ALLOC && !(sh_flags & SHF_WRITE))
+					|| (sh_flags & SHF_ALLOC && sh_flags & SHF_EXECINSTR))
 					c = 'r';
 			}
 			if (bind == STB_GLOBAL && c != '?')
