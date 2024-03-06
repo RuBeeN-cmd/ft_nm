@@ -28,9 +28,6 @@ uint16_t	read_uint16(uint16_t value, int endian);
 uint32_t	read_uint32(uint32_t value, int endian);
 uint64_t	read_uint64(uint64_t value, int endian);
 
-// print_ehdr.c
-void	print_ehdr(void *ehdr, uint8_t class, uint8_t endian);
-
 // getters_ehdr.c
 uint8_t		*get_e_ident(void *ehdr);
 uint16_t	get_e_type(void *ehdr, uint8_t endian);

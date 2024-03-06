@@ -15,8 +15,7 @@ SRC = main.c \
 		print.c \
 		getters_ehdr.c \
 		getters_shdr.c \
-		getters_sym.c \
-		print_ehdr.c
+		getters_sym.c
 OBJ = $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))
 
 CC = gcc
