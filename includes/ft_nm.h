@@ -9,6 +9,11 @@
 #include <stdio.h>
 #include <elf.h>
 
+#ifndef EM_ARC_COMPACT2
+# define EM_ARC_COMPACT2 195
+# endif
+
+
 #define RESET "\033[0m"
 #define RED "\033[0;31m"
 #define GREEN "\033[0;32m"
