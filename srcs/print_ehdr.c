@@ -330,8 +330,8 @@ void	print_machine(uint16_t machine)
 		ft_printf("COREA_1ST (KIT CoreA 1st generation processor family)\n"RESET);
 	else if (machine == EM_COREA_2ND)
 		ft_printf("COREA_2ND (KIT CoreA 2nd generation processor family)\n"RESET);
-	else if (machine == EM_ARC_COMPACT2)
-		ft_printf("ARC_COMPACT2 (Synopsys ARCompact V2)\n"RESET);
+	// else if (machine == EM_ARC_COMPACT2)
+	// 	ft_printf("ARC_COMPACT2 (Synopsys ARCompact V2)\n"RESET);
 	else if (machine == EM_OPEN8)
 		ft_printf("OPEN8 (Open8 8-bit RISC soft processor core)\n"RESET);
 	else if (machine == EM_RL78)
