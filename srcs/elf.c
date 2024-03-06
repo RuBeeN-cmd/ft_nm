@@ -119,6 +119,7 @@ t_elf	init_elf(uint8_t *addr, uint64_t size, int flags)
 	elf.shnum = EH_SHNUM(addr, elf.class, elf.endian);
 	if (!elf.shnum || define_shdr(addr, &elf))
 		return (DEF_ELF);
+	print_ehdr(addr, elf.class, elf.endian);
 	return (elf);
 }
 
