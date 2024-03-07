@@ -1,5 +1,8 @@
 #include "ft_nm.h"
 
+
+
+
 /**
  * @brief		Get the name of a symbol
  * @param[in]	sym A pointer to the symbol

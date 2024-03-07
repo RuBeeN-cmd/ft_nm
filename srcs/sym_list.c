@@ -64,7 +64,7 @@ void	sort_sym_list(t_sym_list *sym, int class, int endian, int reverse)
 {
 	t_sym_list	*tmp;
 	int			ret;
-uint64_t	sym_value;
+	uint64_t	sym_value;
 	uint64_t	tmp_value;
 
 	while (sym)
@@ -134,7 +134,7 @@ t_sym_list	*init_sym_list(t_elf elf)
 		return (NULL);
 	sym_list->addr = elf.symtab;
 	if (ELF32_ST_TYPE(get_st_info(sym_list->addr, elf.class)) == STT_SECTION)
-		sym_list->name = elf.shstrtab + get_sh_name(elf.shdr + get_st_shndx(sym_list->addr, elf.class, elf.endian), elf.class, elf.endian);
+		sym_list->name = elf.shstrtab + get_sh_name(elf.shdr + get_st_shndx(sym_list->addr, elf.class, elf.endian) * SHDR_SIZE(elf.class), elf.class, elf.endian);
 	else
 		sym_list->name = elf.strtab + get_st_name(elf.symtab, elf.class, elf.endian);
 	

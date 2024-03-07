@@ -54,6 +54,8 @@ void	print_letter(void *sym, void *shdr, uint16_t shnum, int class, int endian)
 	}
 	else if (st_bind == STB_GNU_UNIQUE)
 		c = 'u';
+	else if (st_type == STT_SECTION)
+		c = 'N';
 	else
 	{
 		if (shndx == SHN_UNDEF)
@@ -68,7 +70,9 @@ void	print_letter(void *sym, void *shdr, uint16_t shnum, int class, int endian)
 			{
 				uint32_t	sh_type = get_sh_type(shdr + shndx * SHDR_SIZE(class), class, endian);
 				uint64_t	sh_flags = get_sh_flags(shdr + shndx * SHDR_SIZE(class), class, endian);
-				if (sh_type == SHT_NOBITS)
+				if (sh_type == SHT_GROUP)
+					c = 'n';
+				else if (sh_type == SHT_NOBITS)
 					c = 'b';
 				else if (sh_flags == (SHF_ALLOC | SHF_WRITE))
 					c = 'd';

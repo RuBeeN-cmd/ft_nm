@@ -75,10 +75,10 @@ static int	define_shdr(void *ehdr, t_elf *elf)
 {
 	if (!ehdr || !elf)
 		return (1);
-	uint16_t	shstrndx = get_e_shstrndx(ehdr, elf->class, elf->endian);
-	if (shstrndx >= elf->shnum)
+	uint16_t	e_shstrndx = get_e_shstrndx(ehdr, elf->class, elf->endian);
+	if (e_shstrndx >= elf->shnum)
 		return (0);
-	char	*shstrtab = (char *) ehdr + get_sh_offset(elf->shdr + get_e_shstrndx(ehdr, elf->class, elf->endian) * SHDR_SIZE(elf->class), elf->class, elf->endian);
+	char	*shstrtab = (char *) ehdr + get_sh_offset(elf->shdr + e_shstrndx * SHDR_SIZE(elf->class), elf->class, elf->endian);
 	char	*shdr = elf->shdr;
 	for (uint16_t i = 0; i < elf->shnum; i++)
 	{
@@ -90,11 +90,10 @@ static int	define_shdr(void *ehdr, t_elf *elf)
 		}
 		else if (type == SHT_STRTAB)
 		{
-			char	*sh_name = shstrtab + get_sh_name(shdr, elf->class, elf->endian);
-			if (!ft_strncmp(sh_name, ".strtab", 8))
-				elf->strtab = (char *) ehdr + get_sh_offset(shdr, elf->class, elf->endian);
-			else if (!ft_strncmp(sh_name, ".shstrtab", 10))
+			if (i == e_shstrndx)
 				elf->shstrtab = (char *) ehdr + get_sh_offset(shdr, elf->class, elf->endian);
+			if (!ft_strncmp(shstrtab + get_sh_name(shdr, elf->class, elf->endian), ".strtab", 8))
+				elf->strtab = (char *) ehdr + get_sh_offset(shdr, elf->class, elf->endian);
 		}
 		shdr += SHDR_SIZE(elf->class);
 	}
