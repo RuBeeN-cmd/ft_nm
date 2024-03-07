@@ -12,7 +12,10 @@ SRC = main.c \
 		sym_list.c \
 		error.c \
 		read_uint.c \
-		print.c
+		print.c \
+		getters_ehdr.c \
+		getters_shdr.c \
+		getters_sym.c
 OBJ = $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))
 
 CC = gcc

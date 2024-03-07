@@ -1,10 +1,12 @@
 #ifndef FLAGS_H
 #define FLAGS_H
 
+// Flags
 #define FLAGS_NB 6
 #define FLAGS "agurph"
 #define LONG_FLAGS (char *[]) { "debug-syms", "extern-only", "undefined-only", "reverse-sort", "no-sort", "help" }
 
+// Flags Mask
 #define DEBUG_SYMS		1 << 0
 #define EXTERN_ONLY		1 << 1
 #define UNDEFINED_ONLY	1 << 2
