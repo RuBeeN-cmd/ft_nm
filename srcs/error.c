@@ -18,3 +18,17 @@ void	print_error(char *str, char *file, int quotes)
 	ft_putstr_fd(str, 2);
 	ft_putchar_fd('\n', 2);
 }
+
+/**
+ * @brief		Print a warning message
+ * @param[in]	str The warning message to print
+ * @param[in]	file The file to print
+ */
+void	print_warning(char *str, char *file)
+{
+	ft_putstr_fd("nm: warning: ", 2);
+	ft_putstr_fd(file, 2);
+	ft_putstr_fd(": ", 2);
+	ft_putstr_fd(str, 2);
+	ft_putchar_fd('\n', 2);
+}

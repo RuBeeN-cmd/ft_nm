@@ -64,7 +64,7 @@ void	sort_sym_list(t_sym_list *sym, int class, int endian, int reverse)
 {
 	t_sym_list	*tmp;
 	int			ret;
-	uint64_t	sym_value;
+uint64_t	sym_value;
 	uint64_t	tmp_value;
 
 	while (sym)
@@ -72,11 +72,11 @@ void	sort_sym_list(t_sym_list *sym, int class, int endian, int reverse)
 		tmp = sym->next;
 		while (tmp)
 		{
-			ret = ft_strcmp_escape(sym->name, tmp->name, "", 0);
+			ret = ft_strcmp_escape(sym->name, tmp->name, "_.@", 1);
 			if (!ret)
 			{
-				sym_value = SYM_VALUE(sym->addr, class, endian);
-				tmp_value = SYM_VALUE(tmp->addr, class, endian);
+				sym_value = get_st_value(sym->addr, class, endian);
+				tmp_value = get_st_value(tmp->addr, class, endian);
 			}
 			if ((reverse && (ret < 0 || (!ret && sym_value < tmp_value)))
 				|| (!reverse && (ret > 0 || (!ret && sym_value > tmp_value))))
@@ -89,53 +89,58 @@ void	sort_sym_list(t_sym_list *sym, int class, int endian, int reverse)
 
 /**
  * @brief		Check if a symbol is printable
- * @param[in]	addr The address of the symbol
+ * @param[in]	sym The symbol
  * @param[in]	class The class of the elf file
  * @param[in]	endian The endian of the elf file
  * @param[in]	flags The flags to use
  * @return		1 if the symbol is printable, 0 otherwise
  */
-int	is_printable(void *addr, int class, int endian, int flags)
+int	is_printable(void *sym, int class, int endian, int flags)
 {
+	uint8_t	st_info = get_st_info(sym, class);
+	uint8_t	bind = ELF32_ST_BIND(st_info);
+	uint8_t	type = ELF32_ST_TYPE(st_info);
 	if (!(flags & DEBUG_SYMS)
-		&& (SYM_INFO(addr, class) == STT_FILE || SYM_INFO(addr, class) == STT_SECTION))
+		&& (type == STT_FILE || type == STT_SECTION))
 		return (0);
-	if (flags & EXTERN_ONLY && SYM_BIND(addr, class) == STB_LOCAL)
+	if (flags & EXTERN_ONLY && bind == STB_LOCAL)
 		return (0);
-	if (flags & UNDEFINED_ONLY && SYM_SHNDX(addr, class, endian) != SHN_UNDEF)
+	if (flags & UNDEFINED_ONLY && get_st_shndx(sym, class, endian) != SHN_UNDEF)
 		return (0);
-	if (!ft_memcmp(addr, &DEF_SYM, SYM_SSIZE(class)))
+	if (!ft_memcmp(sym, &DEF_SYM, SYM_SIZE(class)))
 		return (0);
 	return (1);
 }
 
 /**
  * @brief		Initialize a symbol list
- * @param[in]	section The section to use
- * @param[in]	class The class of the elf file
- * @param[in]	endian The endian of the elf file
- * @param[in]	flags The flags to use
- * @param[in]	shdr The section headers of the elf file
- * @param[in]	shstrtab The section header string table of the elf file
+ * @param[in]	elf The elf structure to use
  * @return		The initialized symbol list
  */
-t_sym_list	*init_sym_list(t_sym_section section, int class, int endian, int flags, void *shdr, char *shstrtab)
+t_sym_list	*init_sym_list(t_elf elf)
 {
 	t_sym_list	*sym_list;
 
-	if (!section.len)
+	if (!elf.symnum)
 		return (NULL);
-	if  (!is_printable(section.symtab, class, endian,  flags))
-		return (init_sym_list((t_sym_section) {NEXT_SYM(section.symtab, class), section.len - 1, section.strtab}, class, endian, flags, shdr, shstrtab));
+	if  (!is_printable(elf.symtab, elf.class, elf.endian, elf.flags))
+	{
+		elf.symtab += SYM_SIZE(elf.class);
+		elf.symnum--;
+		return (init_sym_list(elf));
+	}
 	sym_list = malloc(sizeof(t_sym_list));
 	if (!sym_list)
 		return (NULL);
-	sym_list->addr = section.symtab;
-	if (SYM_INFO(sym_list->addr , class) == STT_SECTION)
-		sym_list->name = shstrtab + SH_NAME(SH_INDEX(shdr, SYM_SHNDX(sym_list->addr, class, endian), class), class, endian);
+	sym_list->addr = elf.symtab;
+	if (ELF32_ST_TYPE(get_st_info(sym_list->addr, elf.class)) == STT_SECTION)
+		sym_list->name = elf.shstrtab + get_sh_name(elf.shdr + get_st_shndx(sym_list->addr, elf.class, elf.endian), elf.class, elf.endian);
 	else
-		sym_list->name = section.strtab + SYM_NAME(section.symtab, class, endian);
-	sym_list->next = init_sym_list((t_sym_section) {NEXT_SYM(section.symtab, class), section.len - 1, section.strtab}, class, endian, flags, shdr, shstrtab);
+		sym_list->name = elf.strtab + get_st_name(elf.symtab, elf.class, elf.endian);
+	
+	elf.symtab += SYM_SIZE(elf.class);
+	elf.symnum--;
+	sym_list->next = init_sym_list(elf);
 	return (sym_list);
 }
 

@@ -6,13 +6,15 @@
  * @param[out]	elf The elf structure to fill
  * @param[in]	size The size of the file
  * @param[in]	flags The flags to use
+ * @param[in]	path The path of the file
  */
-void	set_elf_values(unsigned char *header, t_elf *elf, uint64_t size, int flags)
+static void	set_elf_values(unsigned char *header, t_elf *elf, uint64_t size, uint8_t flags, char *path)
 {
 	elf->flags = flags;
 	elf->class = header[EI_CLASS];
 	elf->endian = header[EI_DATA];
 	elf->size = size;
+	elf->path = path;
 }
 
 /**
@@ -21,44 +23,44 @@ void	set_elf_values(unsigned char *header, t_elf *elf, uint64_t size, int flags)
  * @param[in]	size The size of the header
  * @return		0 on success, 1 on error
  */
-int	check_ident(unsigned char *header, uint64_t size)
+static int	check_ident(unsigned char *ident, uint64_t size)
 {
-	if (!header || size < EI_NIDENT)
+	if (!ident || size < EI_NIDENT)
 		return (1);
-	if (ft_strncmp((char *) header, ELFMAG, SELFMAG))
+	if (ft_strncmp((char *) ident, ELFMAG, SELFMAG))
 		return (1);
-	if (header[EI_CLASS] != ELFCLASS32
-		&& header[EI_CLASS] != ELFCLASS64)
+	if (ident[EI_CLASS] != ELFCLASS32
+		&& ident[EI_CLASS] != ELFCLASS64)
 		return (1);
-	if (header[EI_DATA] != ELFDATA2LSB
-		&& header[EI_DATA] != ELFDATA2MSB)
+	if (ident[EI_DATA] != ELFDATA2LSB
+		&& ident[EI_DATA] != ELFDATA2MSB)
 		return (1);
-	if (header[EI_VERSION] != EV_CURRENT)
+	if (ident[EI_VERSION] != EV_CURRENT)
 		return (1);
 	return (0);
 }
 
 /**
  * @brief		Check the elf header
- * @param[in]	hdr The header to check
+ * @param[in]	ehdr The header to check
  * @param[in]	size The size of the header
  * @return		0 on success, 1 on error 
  */
-int	check_elf_header(void *hdr, uint64_t size)
+static int	check_elf_header(void *ehdr, uint64_t size)
 {
 	uint8_t	class;
 	uint8_t	endian;
 
-	if (!hdr)
+	if (!ehdr)
 		return (1);
-	class = EH_IDENT(hdr)[EI_CLASS];
-	endian = EH_IDENT(hdr)[EI_DATA];
-	if (size < EH_SSIZE(class))
+	class = get_e_ident(ehdr)[EI_CLASS];
+	endian = get_e_ident(ehdr)[EI_DATA];
+	if (size < EHDR_SIZE(class))
 		return (1);
-	if (EH_SHOFF(hdr, class, endian)
-		+ EH_SHNUM(hdr, class, endian) * SH_SSIZE(class) > size)
+	if (get_e_shoff(ehdr, class, endian)
+		+ get_e_shnum(ehdr, class, endian) * SHDR_SIZE(class) > size)
 		return (1);
-	if (EH_SHENTSIZE(hdr, class, endian) != SH_SSIZE(class))
+	if (get_e_shentsize(ehdr, class, endian) != SHDR_SIZE(class))
 		return (1);
 	return (0);
 }
@@ -69,33 +71,32 @@ int	check_elf_header(void *hdr, uint64_t size)
  * @param[out]	elf The elf structure to fill
  * @return		0 on success, 1 on error
  */
-int	define_shdr(uint8_t *addr, t_elf *elf)
+static int	define_shdr(void *ehdr, t_elf *elf)
 {
-	uint8_t		*header;
-	char		*strtab;
-
-	if (!addr || !elf)
+	if (!ehdr || !elf)
 		return (1);
-	header = addr + EH_SHOFF(addr, elf->class, elf->endian);
-	void	*sh = SH_INDEX(header, EH_SHSTRNDX(addr, elf->class, elf->endian), elf->class);
-	if ((unsigned long) sh - (unsigned long) addr > elf->size)
-		return (1);
-	uint64_t	sh_offset = SH_OFFSET(sh, elf->class, elf->endian);
-	strtab = (char *) (addr + sh_offset);
-	for (uint16_t i = 0; i < EH_SHNUM(addr, elf->class, elf->endian); i++)
+	uint16_t	shstrndx = get_e_shstrndx(ehdr, elf->class, elf->endian);
+	if (shstrndx >= elf->shnum)
+		return (0);
+	char	*shstrtab = (char *) ehdr + get_sh_offset(elf->shdr + get_e_shstrndx(ehdr, elf->class, elf->endian) * SHDR_SIZE(elf->class), elf->class, elf->endian);
+	char	*shdr = elf->shdr;
+	for (uint16_t i = 0; i < elf->shnum; i++)
 	{
-		if (SH_TYPE(SH_INDEX(header, i, elf->class), elf->class, elf->endian) == SHT_SYMTAB)
+		uint32_t	type = get_sh_type(shdr, elf->class, elf->endian);
+		if (type == SHT_SYMTAB)
 		{
-			elf->symtab.symtab = addr + SH_OFFSET(SH_INDEX(header, i, elf->class), elf->class, elf->endian);
-			elf->symtab.len = SH_SIZE(SH_INDEX(header, i, elf->class), elf->class, elf->endian) / SYM_SSIZE(elf->class);
+			elf->symtab = ehdr + get_sh_offset(shdr, elf->class, elf->endian);
+			elf->symnum = get_sh_size(shdr, elf->class, elf->endian) / SYM_SIZE(elf->class);
 		}
-		else if (SH_TYPE(SH_INDEX(header, i, elf->class), elf->class, elf->endian) == SHT_STRTAB)
+		else if (type == SHT_STRTAB)
 		{
-			if (!ft_strncmp(strtab + SH_NAME(SH_INDEX(header, i, elf->class), elf->class, elf->endian), ".strtab", 8))
-				elf->symtab.strtab = (char *) addr + SH_OFFSET(SH_INDEX(header, i, elf->class), elf->class, elf->endian);
-			if (!ft_strncmp(strtab + SH_NAME(SH_INDEX(header, i, elf->class), elf->class, elf->endian), ".shstrtab", 10))
-				elf->shstrtab = (char *) addr + SH_OFFSET(SH_INDEX(header, i, elf->class), elf->class, elf->endian);
+			char	*sh_name = shstrtab + get_sh_name(shdr, elf->class, elf->endian);
+			if (!ft_strncmp(sh_name, ".strtab", 8))
+				elf->strtab = (char *) ehdr + get_sh_offset(shdr, elf->class, elf->endian);
+			else if (!ft_strncmp(sh_name, ".shstrtab", 10))
+				elf->shstrtab = (char *) ehdr + get_sh_offset(shdr, elf->class, elf->endian);
 		}
+		shdr += SHDR_SIZE(elf->class);
 	}
 	return (0);
 }
@@ -105,9 +106,10 @@ int	define_shdr(uint8_t *addr, t_elf *elf)
  * @param[in]	addr The address of the mapped file
  * @param[in]	size The size of the mapped file
  * @param[in]	flags The flags to use
+ * @param[in]	path The path of the file
  * @return		The initialized elf structure
  */
-t_elf	init_elf(uint8_t *addr, uint64_t size, int flags)
+t_elf	init_elf(uint8_t *addr, uint64_t size, uint8_t flags, char *path)
 {
 	t_elf	elf;
 
@@ -116,27 +118,28 @@ t_elf	init_elf(uint8_t *addr, uint64_t size, int flags)
 	if (check_elf_header(addr, size))
 		return (DEF_ELF);
 	ft_bzero(&elf, sizeof(t_elf));
-	set_elf_values(addr, &elf, size, flags);
-	elf.shdr = addr + EH_SHOFF(addr, elf.class, elf.endian);
-	elf.shnum = EH_SHNUM(addr, elf.class, elf.endian);
+	set_elf_values(addr, &elf, size, flags, path);
+	elf.shdr = addr + get_e_shoff(addr, elf.class, elf.endian);
+	elf.shnum = get_e_shnum(addr, elf.class, elf.endian);
 	if (!elf.shnum || define_shdr(addr, &elf))
 		return (DEF_ELF);
+	if (!elf.shstrtab)
+		print_warning("has a corrupt string table index - ignoring", elf.path);
 	return (elf);
 }
 
 /**
  * @brief		Print the symbols of an elf file
  * @param[in]	elf The elf structure to print
- * @param[in]	file_path The path to the file to print
  */
-void	print_elf(t_elf elf, char *file_path)
+void	print_elf(t_elf elf)
 {
-	if (!elf.symtab.symtab || !elf.symtab.strtab)
+	if (!elf.symtab || !elf.strtab || !elf.shstrtab)
 	{
-		print_error("no symbols", file_path, 0);
+		print_error("no symbols", elf.path, 0);
 		return ;
 	}
-	t_sym_list	*all_sym = init_sym_list(elf.symtab, elf.class, elf.endian, elf.flags, elf.shdr, elf.shstrtab);
+	t_sym_list	*all_sym = init_sym_list(elf);
 	if (!(elf.flags & NO_SORT))
 		sort_sym_list(all_sym, elf.class, elf.endian, elf.flags & REVERSE_SORT);
 	print_sym_list(all_sym, elf.shdr, elf.shnum, elf.class, elf.endian);

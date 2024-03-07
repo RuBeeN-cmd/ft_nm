@@ -1,29 +1,12 @@
 #include "ft_nm.h"
 
 /**
- * @brief		Parse the flags from the command line
- * @param[in]	argc The number of arguments
- * @param[in]	argv The arguments
- * @return		The flags parsed from the command line
- */
-int	get_argc_left(int argc, char *argv[])
-{
-	if (argc < 0 || !argv)
-		return (-1);
-	int	ret = 0;
-	for (int i = 0; i < argc; i++)
-		if (argv[i])
-			ret++;
-	return (ret);
-}
-
-/**
  * @brief		Map a file into memory
  * @param[in]	path The path to the file to map
  * @param[out]	size_buf A pointer to an unsigned long to store the size of the file
  * @return		A pointer to the mapped file, or NULL if an error occurred
  */
-void	*map_file(char path[], unsigned long *size_buf)
+static void	*map_file(char path[], unsigned long *size_buf)
 {
 	void		*addr;
 	struct stat	stat_buf;
@@ -59,7 +42,7 @@ void	*map_file(char path[], unsigned long *size_buf)
  * @param[in]	multiple_files Whether or not multiple files are being printed
  * @return		0 if the symbols were printed successfully, 1 otherwise
  */
-int	list_file_symbols(char path[], int flags, int multiple_files)
+static int	list_file_symbols(char path[], uint8_t flags, int multiple_files)
 {
 	uint64_t		size;
 	void			*addr;
@@ -70,7 +53,7 @@ int	list_file_symbols(char path[], int flags, int multiple_files)
 	addr = map_file(path, &size);
 	if (!addr)
 		return (1);
-	elf = init_elf(addr, size, flags);
+	elf = init_elf(addr, size, flags, path);
 	if (!ft_memcmp(&elf, &DEF_ELF, sizeof(t_elf)))
 	{
 		print_error("file format not recognized", path, 0);	
@@ -79,10 +62,27 @@ int	list_file_symbols(char path[], int flags, int multiple_files)
 	}
 	if (multiple_files)
 		ft_printf("\n%s:\n", path);
-	print_elf(elf, path);
+	print_elf(elf);
 	if (munmap(addr, size) == -1)
 		return (1);
 	return (0);
+}
+
+/**
+ * @brief		Get the number of Non NULL arguments
+ * @param[in]	argc The number of arguments
+ * @param[in]	argv The arguments
+ * @return		The number of Non NULL arguments
+ */
+static int	get_argc_left(int argc, char *argv[])
+{
+	if (argc < 0 || !argv)
+		return (-1);
+	int	ret = 0;
+	for (int i = 0; i < argc; i++)
+		if (argv[i])
+			ret++;
+	return (ret);
 }
 
 int	main(int argc, char *argv[])

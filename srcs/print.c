@@ -36,22 +36,23 @@ void	print_value(uint64_t value, uint16_t shndx, uint64_t sym_value_size)
  */
 void	print_letter(void *sym, void *shdr, uint16_t shnum, int class, int endian)
 {
-	uint8_t		type = SYM_TYPE(sym, class);
-	uint8_t		bind = SYM_BIND(sym, class);
-	uint16_t	shndx = SYM_SHNDX(sym, class, endian);
+	uint16_t	st_info = get_st_info(sym, class);
+	uint8_t		st_type = ELF32_ST_TYPE(st_info);
+	uint8_t		st_bind = ELF32_ST_BIND(st_info);
+	uint16_t	shndx = get_st_shndx(sym, class, endian);
 
 	unsigned char c = '?';
 
-	if (bind == STB_WEAK)
+	if (st_bind == STB_WEAK)
 	{
-		if (type == STT_OBJECT)
+		if (st_type == STT_OBJECT)
 			c = 'V';
 		else
 			c = 'W';
 		if (shndx == SHN_UNDEF)
 			c += 32;
 	}
-	else if (bind == STB_GNU_UNIQUE)
+	else if (st_bind == STB_GNU_UNIQUE)
 		c = 'u';
 	else
 	{
@@ -65,8 +66,8 @@ void	print_letter(void *sym, void *shdr, uint16_t shnum, int class, int endian)
 				c = 'c';
 			else if (shndx < shnum)
 			{
-				uint32_t	sh_type = SH_TYPE(SH_INDEX(shdr, shndx, class), class, endian);
-				uint64_t	sh_flags = SH_FLAGS(SH_INDEX(shdr, shndx, class), class, endian);
+				uint32_t	sh_type = get_sh_type(shdr + shndx * SHDR_SIZE(class), class, endian);
+				uint64_t	sh_flags = get_sh_flags(shdr + shndx * SHDR_SIZE(class), class, endian);
 				if (sh_type == SHT_NOBITS)
 					c = 'b';
 				else if (sh_flags == (SHF_ALLOC | SHF_WRITE))
@@ -78,7 +79,7 @@ void	print_letter(void *sym, void *shdr, uint16_t shnum, int class, int endian)
 					|| (sh_flags & SHF_ALLOC && sh_flags & SHF_EXECINSTR))
 					c = 'r';
 			}
-			if (bind == STB_GLOBAL && c != '?')
+			if (st_bind == STB_GLOBAL && c != '?')
 				c -= 32;
 		}
 	}
@@ -97,7 +98,7 @@ void	print_sym_list(t_sym_list *sym, void *shdr, uint16_t shnum, int class, int 
 {
 	while (sym)
 	{
-		print_value(SYM_VALUE(sym->addr, class, endian), SYM_SHNDX(sym->addr, class, endian), SYM_VALUE_SSIZE(class));
+		print_value(get_st_value(sym->addr, class, endian), get_st_shndx(sym->addr, class, endian), SIZE(class));
 		print_letter(sym->addr, shdr, shnum, class, endian);
 		ft_printf("%s\n", sym->name);
 		sym = sym->next;

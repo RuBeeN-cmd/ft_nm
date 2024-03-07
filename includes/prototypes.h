@@ -7,18 +7,18 @@
 int	parse_flags(int argc, char *argv[]);
 
 // elf.c
-t_elf	init_elf(uint8_t *addr, uint64_t size, int flags);
-int		define_shdr(uint8_t *addr, t_elf *elf);
-void	print_elf(t_elf elf, char *file_path);
+t_elf	init_elf(uint8_t *addr, uint64_t size, uint8_t flags, char *path);
+void	print_elf(t_elf elf);
 
 // sym_list.c
-t_sym_list	*init_sym_list(t_sym_section section, int class, int endian, int flags, void *shdr, char *shstrtab);
+t_sym_list	*init_sym_list(t_elf elf);
 void		free_sym_list(t_sym_list *sym_list);
 void		sort_sym_list(t_sym_list *sym, int class, int endian, int reverse);
 int     	ft_strcmp_escape(char *n1, char *n2, char *set, int lower);
 
 // error.c
 void	print_error(char *str, char *file, int quotes);
+void	print_warning(char *str, char *file);
 
 // print.c
 void	print_sym_list(t_sym_list *sym, void *shdr, uint16_t shnum, int class, int endian);
@@ -57,11 +57,11 @@ uint64_t	get_sh_addralign(void *shdr, uint8_t class, uint8_t endian);
 uint64_t	get_sh_entsize(void *shdr, uint8_t class, uint8_t endian);
 
 // getters_sym.c
-uint32_t	get_sym_name(void *sym, uint8_t class, uint8_t endian);
-uint64_t	get_sym_value(void *sym, uint8_t class, uint8_t endian);
-uint64_t	get_sym_size(void *sym, uint8_t class, uint8_t endian);
-uint8_t		get_sym_info(void *sym, uint8_t class);
-uint8_t		get_sym_other(void *sym, uint8_t class);
-uint16_t	get_sym_shndx(void *sym, uint8_t class, uint8_t endian);
+uint32_t	get_st_name(void *sym, uint8_t class, uint8_t endian);
+uint64_t	get_st_value(void *sym, uint8_t class, uint8_t endian);
+uint64_t	get_st_size(void *sym, uint8_t class, uint8_t endian);
+uint8_t		get_st_info(void *sym, uint8_t class);
+uint8_t		get_st_other(void *sym, uint8_t class);
+uint16_t	get_st_shndx(void *sym, uint8_t class, uint8_t endian);
 
 #endif

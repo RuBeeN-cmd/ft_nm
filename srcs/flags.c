@@ -5,7 +5,7 @@
  * @param[in]	str The string to parse
  * @return		The flag parsed
  */
-int	get_long_flag(char str[])
+static uint8_t	get_long_flag(char str[])
 {
 	if (!str)
 		return (-1);
@@ -20,9 +20,9 @@ int	get_long_flag(char str[])
  * @param[in]		c The char to parse
  * @return			The flag parsed
  */
-int	get_short_flag(char c)
+static uint8_t	get_short_flag(const char c)
 {
-	char	flags_letter[] = "agurph";
+	const char	flags_letter[] = FLAGS;
 
 	char	*flag_ptr = ft_strchr(flags_letter, c);
 	if (!flag_ptr)
@@ -35,14 +35,16 @@ int	get_short_flag(char c)
  * @param[in]		str The string to parse
  * @return			The flags parsed
  */
-int	get_short_flags(char str[])
+static uint8_t	get_short_flags(const char str[])
 {
+	int	ret;
+
 	if (!str)
 		return (-1);
-	int		flags = 0;
+	uint8_t		flags = 0;
 	for (int i = 0; str[i]; i++)
 	{
-		int	ret = get_short_flag(str[i]);
+		ret = get_short_flag(str[i]);
 		if (ret == -1)
 			return (-1);
 		flags |= ret;
@@ -51,14 +53,14 @@ int	get_short_flags(char str[])
 }
 
 /**
- * @brief			Parse the flags, and remove them from the arguments
+ * @brief			Parse the flags, and set them to NULL
  * @param[in]		argc The number of arguments
  * @param[in,out]	argv The arguments
  * @return			The flags parsed
  */
 int	parse_flags(int argc, char *argv[])
 {
-	int	flags = 0;
+	uint8_t	flags = 0;
 
 	if (!argv)
 		return (-1);
@@ -77,7 +79,7 @@ int	parse_flags(int argc, char *argv[])
 				return (-1);
 			flags |= ret;
 			if (ret)
-				argv[i] = NULL;
+				argv[i] = NULL; // Set argv to NULL if it was parsed
 		}
 	}
 	return (flags);
