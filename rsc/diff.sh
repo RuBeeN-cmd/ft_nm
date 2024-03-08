@@ -11,6 +11,7 @@ RESET="\e[0m"
 BIN=$1
 GOOD_FILE="rsc/test_file/good_files/"
 BAD_FILE="rsc/test_file/good_files/"
+EXIT_CODE=0
 
 display_color_msg() {
 	COLOR=$1
@@ -46,6 +47,7 @@ elf_file_diff() {
     diff out nm_out 
 	if [ $? -ne 0 ]; then
 		display_double_color_msg ${YELLOW} "Diff ${BIN}: " ${RED} "KO"
+		EXIT_CODE=1
 	else
 		display_double_color_msg ${YELLOW} "Diff ${BIN}: " ${GREEN} "OK"
 	fi
@@ -142,5 +144,9 @@ exit_code_tester() {
 }
 
 exit_code_tester
+
+if [ $EXIT_CODE -ne 0 ]; then
+exit 1
+fi
 
 #### END ####
