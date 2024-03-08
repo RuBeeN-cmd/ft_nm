@@ -55,4 +55,7 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+test: ${NAME}
+	@./rsc/diff.sh ${NAME}
+
+.PHONY: all clean fclean re test

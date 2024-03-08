@@ -79,8 +79,7 @@ void	print_letter(void *sym, void *shdr, uint16_t shnum, int class, int endian)
 				else if (sh_type == SHT_PROGBITS
 					&& sh_flags == (SHF_ALLOC | SHF_EXECINSTR))
 					c = 't';
-				else if ((sh_flags & SHF_ALLOC && !(sh_flags & SHF_WRITE))
-					|| (sh_flags & SHF_ALLOC && sh_flags & SHF_EXECINSTR))
+				else if ((sh_flags & SHF_ALLOC && !(sh_flags & SHF_WRITE)))
 					c = 'r';
 			}
 			if (st_bind == STB_GLOBAL && c != '?')

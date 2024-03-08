@@ -1,5 +1,4 @@
 .vscode
-*.o
 ft_nm
 objs
 42-Nm-Tester
