@@ -111,6 +111,7 @@ check_test_passed() {
 	fi
 }
 
+echo $LC_COLLATE
 basic_diff_test
 correct_error_test
 incorrect_error_test
