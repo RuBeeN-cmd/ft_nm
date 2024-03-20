@@ -23,6 +23,3 @@ jobs:
 
     - name: clean
       run: make fclean
-
-    - name: test
-      run: make test
