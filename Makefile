@@ -31,7 +31,7 @@ OBJ_DIR = objs
 all: $(NAME)
 
 $(NAME): $(LIB) $(OBJ_DIR) $(OBJ)
-	@echo $(_GREEN)Compiling $(OBJ)...$(END)
+	@echo $(_GREEN)Compiling $(OBJ)...$(_END)
 	@$(CC) $(CFLAGS) $(OBJ) $(LIBFLAGS) -o $@
 
 $(LIB):
@@ -41,16 +41,16 @@ $(OBJ_DIR):
 	@mkdir -p $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	@echo $(_CYAN)Compiling $<...$(END)
+	@echo $(_CYAN)Compiling $<...$(_END)
 	@$(CC) -o $@ -c $< $(CFLAGS) $(INC)
 
 clean:
-	@echo $(_YELLOW)Cleaning $(OBJ)...$(END)
+	@echo $(_YELLOW)Cleaning $(OBJ)...$(_END)
 	@make -C $(dir $(LIB)) fclean
 	@rm -rf $(OBJ_DIR)
 
 fclean: clean
-	@echo $(_RED)Cleaning $(NAME)...$(END)
+	@echo $(_RED)Cleaning $(NAME)...$(_END)
 	@rm -f $(NAME)
 
 re: fclean all
