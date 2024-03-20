@@ -54,8 +54,6 @@ void	print_letter(void *sym, void *shdr, uint16_t shnum, int class, int endian)
 	}
 	else if (st_bind == STB_GNU_UNIQUE)
 		c = 'u';
-	else if (st_type == STT_SECTION)
-		c = 'N';
 	else
 	{
 		if (shndx == SHN_UNDEF)
@@ -81,8 +79,10 @@ void	print_letter(void *sym, void *shdr, uint16_t shnum, int class, int endian)
 					c = 't';
 				else if ((sh_flags & SHF_ALLOC && !(sh_flags & SHF_WRITE)))
 					c = 'r';
+				else if (st_type == STT_SECTION)
+					c = 'N';
 			}
-			if (st_bind == STB_GLOBAL && c != '?')
+			if (st_bind == STB_GLOBAL && c != '?' && c != 'N')
 				c -= 32;
 		}
 	}
