@@ -34,12 +34,12 @@ void	print_value(uint64_t value, uint16_t shndx, uint64_t sym_value_size)
  * @param[in]	class The class of the elf file
  * @param[in]	endian The endian of the elf file
  */
-void	print_letter(void *sym, void *shdr, uint16_t shnum, int class, int endian)
+void	print_letter(t_sym_list *sym, void *shdr, uint16_t shnum, int class, int endian)
 {
-	uint16_t	st_info = get_st_info(sym, class);
+	uint16_t	st_info = get_st_info(sym->addr, class);
 	uint8_t		st_type = ELF32_ST_TYPE(st_info);
 	uint8_t		st_bind = ELF32_ST_BIND(st_info);
-	uint16_t	shndx = get_st_shndx(sym, class, endian);
+	uint16_t	shndx = get_st_shndx(sym->addr, class, endian);
 
 	unsigned char c = '?';
 
@@ -68,9 +68,7 @@ void	print_letter(void *sym, void *shdr, uint16_t shnum, int class, int endian)
 			{
 				uint32_t	sh_type = get_sh_type(shdr + shndx * SHDR_SIZE(class), class, endian);
 				uint64_t	sh_flags = get_sh_flags(shdr + shndx * SHDR_SIZE(class), class, endian);
-				if (sh_type == SHT_GROUP)
-					c = 'n';
-				else if (sh_type == SHT_NOBITS)
+				if (sh_type == SHT_NOBITS)
 					c = 'b';
 				else if (sh_flags == (SHF_ALLOC | SHF_WRITE))
 					c = 'd';
@@ -79,10 +77,10 @@ void	print_letter(void *sym, void *shdr, uint16_t shnum, int class, int endian)
 					c = 't';
 				else if ((sh_flags & SHF_ALLOC && !(sh_flags & SHF_WRITE)))
 					c = 'r';
-				else if (st_type == STT_SECTION)
-					c = 'N';
+				else if (sh_type == SHT_PROGBITS || sh_type == SHT_GROUP || st_type == STT_SECTION)
+					c = 'n';
 			}
-			if (st_bind == STB_GLOBAL && c != '?' && c != 'N')
+			if (c != '?' && (st_bind == STB_GLOBAL || !ft_strncmp(sym->name, ".debug", 6)))
 				c -= 32;
 		}
 	}
@@ -102,7 +100,7 @@ void	print_sym_list(t_sym_list *sym, void *shdr, uint16_t shnum, int class, int 
 	while (sym)
 	{
 		print_value(get_st_value(sym->addr, class, endian), get_st_shndx(sym->addr, class, endian), SIZE(class));
-		print_letter(sym->addr, shdr, shnum, class, endian);
+		print_letter(sym, shdr, shnum, class, endian);
 		ft_printf("%s\n", sym->name);
 		sym = sym->next;
 	}

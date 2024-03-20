@@ -72,7 +72,7 @@ void	sort_sym_list(t_sym_list *sym, int class, int endian, int reverse)
 		tmp = sym->next;
 		while (tmp)
 		{
-			ret = ft_strcmp_escape(sym->name, tmp->name, "_.@", 1);
+			ret = ft_strcmp_escape(sym->name, tmp->name, "-_.@", 1);
 			if (!ret)
 			{
 				sym_value = get_st_value(sym->addr, class, endian);
