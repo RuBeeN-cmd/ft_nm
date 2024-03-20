@@ -78,7 +78,7 @@ void	sort_sym_list(t_sym_list *sym, int class, int endian, int reverse)
 				sym_value = get_st_value(sym->addr, class, endian);
 				tmp_value = get_st_value(tmp->addr, class, endian);
 			}
-			if ((!ret && sym_value < tmp_value)
+			if ((!ret && sym_value > tmp_value)
 				|| (reverse && ret < 0)
 				|| (!reverse && ret > 0))
 				swap_sym_list(sym, tmp);
